@@ -1,0 +1,150 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Enterprise Enterprise[]
+}
+
+// ********************************
+// USER MODELS
+// ********************************
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  firstName String
+  lastName  String?
+  password  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Each user can be only of one of the following types
+  Enterprise Enterprise?
+  Client     Client?
+  Employee   Employee?
+  Admin      Admin?
+}
+
+// Enterprise is also a type of user, representing the admininstrator of the enterprise
+model Enterprise {
+  id          Int    @id @default(autoincrement())
+  description String
+
+  commissionPercentage Float
+  enterpriseCode       String @unique
+  location             String
+  phone                String
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  Offer    Offer[]
+  Employee Employee[]
+
+  Category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+}
+
+model Client {
+  id    Int    @id @default(autoincrement())
+  phone String
+  DUI   String    @unique
+
+  Coupons Coupon[]
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Employee {
+  id    Int     @id @default(autoincrement())
+  name  String
+  phone String?
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  enterpriseId Int
+  enterprise   Enterprise @relation(fields: [enterpriseId], references: [id])
+}
+
+model Admin {
+  id    Int    @id @default(autoincrement())
+  phone String
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+}
+
+// ********************************
+// OFFER MODELS
+// ********************************
+
+enum OfferState {
+  PENDING
+  APPROVED
+  ACTIVE
+  EXPIRED
+  REJECTED
+  DISCARDED
+}
+
+model Offer {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String
+  originalPrice Float
+  discountPrice Float
+  validFrom     DateTime
+  validUntil    DateTime
+  quantityLimit Int?
+  sold          Int?     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  offerState          OfferState
+  approvedAt          DateTime?
+  offerRejectedReason String?
+
+  enterpriseId Int
+  enterprise   Enterprise @relation(fields: [enterpriseId], references: [id])
+
+  Coupon Coupon[]
+}
+
+enum CouponState {
+  VALID
+  USED
+  EXPIRED
+}
+
+model Coupon {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  couponState CouponState
+
+  offerId      Int
+  offerDetails Offer @relation(fields: [offerId], references: [id])
+
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
+}
