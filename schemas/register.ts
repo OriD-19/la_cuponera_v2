@@ -14,6 +14,7 @@ export const registerClientRequestSchema = z.object({
 export const registerEnterpriseRequestSchema = z.object({
     email: z.string().email(),
     password: z.string().min(8),
+    description: z.string(),
     firstName: z.string(),
     commissionPercentage: z.number(),
     phone: z.string(),
