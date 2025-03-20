@@ -5,7 +5,7 @@ import { registerClientRequestSchema, registerEmployeeRequestSchema, registerEnt
 
 import { PrismaClient } from '@prisma/client';
 
-const app = new Hono<{ Variables: Variables }>().basePath("/register");
+const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
 
 app.post("/client", zValidator('json', registerClientRequestSchema), async c => {
@@ -91,3 +91,5 @@ app.post('/employee', zValidator('json', registerEmployeeRequestSchema), async c
         data: employee
     }, 201);
 });
+
+export default app;
