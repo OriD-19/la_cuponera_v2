@@ -6,6 +6,8 @@ import { registerClientRequestSchema, registerEmployeeRequestSchema, registerEnt
 import { PrismaClient } from '@prisma/client';
 import { authorization, Role } from '../middleware/authorization';
 
+import { hash } from 'bcrypt';
+
 const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
 
@@ -14,6 +16,7 @@ app.post("/client",
     async c => {
 
         const validated = c.req.valid('json');
+        const passwordHash = await hash(validated.password, 10);
 
         const client = await prisma.client.create({
             data: {
@@ -22,7 +25,7 @@ app.post("/client",
                         firstName: validated.firstName,
                         lastName: validated.lastName,
                         email: validated.email,
-                        password: validated.password
+                        password: passwordHash,
                     }
                 },
                 DUI: validated.DUI,
@@ -45,6 +48,7 @@ app.post("/enterprise",
         const validated = c.req.valid('json');
 
         const enterpriseCode = validated.firstName
+        const passwordHash = await hash(validated.password, 10);
 
         const enterprise = await prisma.enterprise.create({
             data: {
@@ -52,7 +56,7 @@ app.post("/enterprise",
                     create: {
                         firstName: validated.firstName,
                         email: validated.email,
-                        password: validated.password
+                        password: passwordHash,
                     }
                 },
                 enterpriseCode: enterpriseCode,
@@ -76,6 +80,7 @@ app.post('/employee',
     async c => {
 
         const validated = c.req.valid('json');
+        const passwordHash = await hash(validated.password, 10);
 
         const employee = await prisma.employee.create({
             data: {
@@ -84,7 +89,7 @@ app.post('/employee',
                         firstName: validated.firstName,
                         lastName: validated.lastName,
                         email: validated.email,
-                        password: validated.password
+                        password: passwordHash,
                     }
                 },
                 phone: validated.phone,
