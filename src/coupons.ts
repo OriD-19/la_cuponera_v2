@@ -5,6 +5,7 @@ import { jwt } from 'hono/jwt';
 import { Variables } from 'hono/types';
 import { describeRoute } from 'hono-openapi';
 import { getCouponsDocs } from '../documentation/coupons.docs';
+import { authorization, Role } from '../middleware/authorization';
 
 // prefix: /api/v1/coupons
 const app = new Hono<{ Variables: Variables }>();
@@ -17,6 +18,7 @@ app.get(
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
+    authorization(Role.CLIENT),
     async c => {
 
         const clientId = parseInt(c.get('jwtPayload').id);
@@ -45,6 +47,7 @@ app.get(
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
+    authorization(Role.CLIENT),
     async c => {
 
         const clientId = parseInt(c.get('jwtPayload').id);
@@ -72,3 +75,5 @@ app.get(
 
         return c.json(coupon);
     });
+
+export default app;

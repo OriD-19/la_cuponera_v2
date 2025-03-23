@@ -6,6 +6,7 @@ import register from './register';
 import employees from './employees';
 import adminClients from './admin/clients';
 import adminEnterprises from './admin/enterprises';
+import coupons from "./coupons";
 import { Variables } from '../schemas/jwtVariables';
 import { apiReference } from "@scalar/hono-api-reference";
 import { openAPISpecs } from 'hono-openapi';
@@ -21,6 +22,7 @@ const app = new Hono<{ Variables: Variables }>().basePath("/api/v1");
 app.route("/login", login);
 app.route("/offers", offers);
 app.route("/register", register);
+app.route("/coupons", coupons);
 
 // protect the route of employees only for an enterprise
 app.use('/employees', authorization(Role.EMPLOYEE));
