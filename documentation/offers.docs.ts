@@ -63,3 +63,35 @@ export const getOffersDocs: DescribeRouteOptions = {
         },
     },
 };
+
+export const getOfferDocs: DescribeRouteOptions = {
+    description: "Get a specific offer",
+    requestParams: {
+        header: z.object({'Authorization': z.string()}),
+    },
+    responses: {
+        200: {
+            description: "offer retrieved successfully",
+            content: {
+                "application/json": {
+                    schema: resolver(OfferSchema),
+                },
+            },
+        },
+        404: {
+            description: "offer not found",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+};

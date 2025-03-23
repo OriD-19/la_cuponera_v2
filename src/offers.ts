@@ -8,7 +8,7 @@ import { validator as zValidator } from 'hono-openapi/zod';
 import { createOfferRequestSchema, getOffersResponseSchema } from '../schemas/offers';
 import { OfferState, PrismaClient } from '@prisma/client';
 import { describeRoute } from 'hono-openapi';
-import { createOfferDocs, getOffersDocs } from '../documentation/offers.docs';
+import { createOfferDocs, getOfferDocs, getOffersDocs } from '../documentation/offers.docs';
 
 // prefix: /api/v1/offers
 const app = new Hono<{ Variables: Variables }>();
@@ -63,18 +63,46 @@ app.get(
     }),
     authorization(Role.ENTERPRISE),
     async c => {
-            const enterpriseId = c.get('jwtPayload').id;
-    
-            const offers = await prisma.offer.findMany({
-                where: {
-                    enterpriseId: parseInt(enterpriseId),
-                },
-            });
-    
-            return c.json({
-                offers: offers,
-            });
+        const enterpriseId = c.get('jwtPayload').id;
+
+        const offers = await prisma.offer.findMany({
+            where: {
+                enterpriseId: parseInt(enterpriseId),
+            },
+        });
+
+        return c.json({
+            offers: offers,
+        });
     }
 );
+
+// for all users
+app.get(
+    '/:id',
+    describeRoute(getOfferDocs),
+    jwt({
+        secret: process.env.TOKEN_SECRET!
+    }),
+    async c => {
+
+        const offerId = c.req.param('id');
+
+        const offer = await prisma.offer.findFirst({
+            where: {
+                id: parseInt(offerId),
+            },
+        });
+
+        if (!offer) {
+            return c.json({
+                message: "offer not found",
+            }, 404);
+        }
+
+        return c.json({
+            offer: offer,
+        });
+    });
 
 export default app;
