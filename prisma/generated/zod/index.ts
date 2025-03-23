@@ -59,6 +59,46 @@ export const CategorySchema = z.object({
 export type Category = z.infer<typeof CategorySchema>
 
 /////////////////////////////////////////
+// CATEGORY PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const CategoryPartialSchema = CategorySchema.partial()
+
+export type CategoryPartial = z.infer<typeof CategoryPartialSchema>
+
+// CATEGORY RELATION SCHEMA
+//------------------------------------------------------
+
+export type CategoryRelations = {
+  Enterprise: EnterpriseWithRelations[];
+};
+
+export type CategoryWithRelations = z.infer<typeof CategorySchema> & CategoryRelations
+
+export const CategoryWithRelationsSchema: z.ZodType<CategoryWithRelations> = CategorySchema.merge(z.object({
+  Enterprise: z.lazy(() => EnterpriseWithRelationsSchema).array(),
+}))
+
+// CATEGORY PARTIAL RELATION SCHEMA
+//------------------------------------------------------
+
+export type CategoryPartialRelations = {
+  Enterprise?: EnterprisePartialWithRelations[];
+};
+
+export type CategoryPartialWithRelations = z.infer<typeof CategoryPartialSchema> & CategoryPartialRelations
+
+export const CategoryPartialWithRelationsSchema: z.ZodType<CategoryPartialWithRelations> = CategoryPartialSchema.merge(z.object({
+  Enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema).array(),
+})).partial()
+
+export type CategoryWithPartialRelations = z.infer<typeof CategorySchema> & CategoryPartialRelations
+
+export const CategoryWithPartialRelationsSchema: z.ZodType<CategoryWithPartialRelations> = CategorySchema.merge(z.object({
+  Enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema).array(),
+}).partial())
+
+/////////////////////////////////////////
 // USER SCHEMA
 /////////////////////////////////////////
 
@@ -73,6 +113,61 @@ export const UserSchema = z.object({
 })
 
 export type User = z.infer<typeof UserSchema>
+
+/////////////////////////////////////////
+// USER PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const UserPartialSchema = UserSchema.partial()
+
+export type UserPartial = z.infer<typeof UserPartialSchema>
+
+// USER RELATION SCHEMA
+//------------------------------------------------------
+
+export type UserRelations = {
+  Enterprise?: EnterpriseWithRelations | null;
+  Client?: ClientWithRelations | null;
+  Employee?: EmployeeWithRelations | null;
+  Admin?: AdminWithRelations | null;
+};
+
+export type UserWithRelations = z.infer<typeof UserSchema> & UserRelations
+
+export const UserWithRelationsSchema: z.ZodType<UserWithRelations> = UserSchema.merge(z.object({
+  Enterprise: z.lazy(() => EnterpriseWithRelationsSchema).nullable(),
+  Client: z.lazy(() => ClientWithRelationsSchema).nullable(),
+  Employee: z.lazy(() => EmployeeWithRelationsSchema).nullable(),
+  Admin: z.lazy(() => AdminWithRelationsSchema).nullable(),
+}))
+
+// USER PARTIAL RELATION SCHEMA
+//------------------------------------------------------
+
+export type UserPartialRelations = {
+  Enterprise?: EnterprisePartialWithRelations | null;
+  Client?: ClientPartialWithRelations | null;
+  Employee?: EmployeePartialWithRelations | null;
+  Admin?: AdminPartialWithRelations | null;
+};
+
+export type UserPartialWithRelations = z.infer<typeof UserPartialSchema> & UserPartialRelations
+
+export const UserPartialWithRelationsSchema: z.ZodType<UserPartialWithRelations> = UserPartialSchema.merge(z.object({
+  Enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema).nullable(),
+  Client: z.lazy(() => ClientPartialWithRelationsSchema).nullable(),
+  Employee: z.lazy(() => EmployeePartialWithRelationsSchema).nullable(),
+  Admin: z.lazy(() => AdminPartialWithRelationsSchema).nullable(),
+})).partial()
+
+export type UserWithPartialRelations = z.infer<typeof UserSchema> & UserPartialRelations
+
+export const UserWithPartialRelationsSchema: z.ZodType<UserWithPartialRelations> = UserSchema.merge(z.object({
+  Enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema).nullable(),
+  Client: z.lazy(() => ClientPartialWithRelationsSchema).nullable(),
+  Employee: z.lazy(() => EmployeePartialWithRelationsSchema).nullable(),
+  Admin: z.lazy(() => AdminPartialWithRelationsSchema).nullable(),
+}).partial())
 
 /////////////////////////////////////////
 // ENTERPRISE SCHEMA
@@ -92,6 +187,61 @@ export const EnterpriseSchema = z.object({
 export type Enterprise = z.infer<typeof EnterpriseSchema>
 
 /////////////////////////////////////////
+// ENTERPRISE PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const EnterprisePartialSchema = EnterpriseSchema.partial()
+
+export type EnterprisePartial = z.infer<typeof EnterprisePartialSchema>
+
+// ENTERPRISE RELATION SCHEMA
+//------------------------------------------------------
+
+export type EnterpriseRelations = {
+  user: UserWithRelations;
+  Offer: OfferWithRelations[];
+  Employee: EmployeeWithRelations[];
+  Category?: CategoryWithRelations | null;
+};
+
+export type EnterpriseWithRelations = z.infer<typeof EnterpriseSchema> & EnterpriseRelations
+
+export const EnterpriseWithRelationsSchema: z.ZodType<EnterpriseWithRelations> = EnterpriseSchema.merge(z.object({
+  user: z.lazy(() => UserWithRelationsSchema),
+  Offer: z.lazy(() => OfferWithRelationsSchema).array(),
+  Employee: z.lazy(() => EmployeeWithRelationsSchema).array(),
+  Category: z.lazy(() => CategoryWithRelationsSchema).nullable(),
+}))
+
+// ENTERPRISE PARTIAL RELATION SCHEMA
+//------------------------------------------------------
+
+export type EnterprisePartialRelations = {
+  user?: UserPartialWithRelations;
+  Offer?: OfferPartialWithRelations[];
+  Employee?: EmployeePartialWithRelations[];
+  Category?: CategoryPartialWithRelations | null;
+};
+
+export type EnterprisePartialWithRelations = z.infer<typeof EnterprisePartialSchema> & EnterprisePartialRelations
+
+export const EnterprisePartialWithRelationsSchema: z.ZodType<EnterprisePartialWithRelations> = EnterprisePartialSchema.merge(z.object({
+  user: z.lazy(() => UserPartialWithRelationsSchema),
+  Offer: z.lazy(() => OfferPartialWithRelationsSchema).array(),
+  Employee: z.lazy(() => EmployeePartialWithRelationsSchema).array(),
+  Category: z.lazy(() => CategoryPartialWithRelationsSchema).nullable(),
+})).partial()
+
+export type EnterpriseWithPartialRelations = z.infer<typeof EnterpriseSchema> & EnterprisePartialRelations
+
+export const EnterpriseWithPartialRelationsSchema: z.ZodType<EnterpriseWithPartialRelations> = EnterpriseSchema.merge(z.object({
+  user: z.lazy(() => UserPartialWithRelationsSchema),
+  Offer: z.lazy(() => OfferPartialWithRelationsSchema).array(),
+  Employee: z.lazy(() => EmployeePartialWithRelationsSchema).array(),
+  Category: z.lazy(() => CategoryPartialWithRelationsSchema).nullable(),
+}).partial())
+
+/////////////////////////////////////////
 // CLIENT SCHEMA
 /////////////////////////////////////////
 
@@ -103,6 +253,51 @@ export const ClientSchema = z.object({
 })
 
 export type Client = z.infer<typeof ClientSchema>
+
+/////////////////////////////////////////
+// CLIENT PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const ClientPartialSchema = ClientSchema.partial()
+
+export type ClientPartial = z.infer<typeof ClientPartialSchema>
+
+// CLIENT RELATION SCHEMA
+//------------------------------------------------------
+
+export type ClientRelations = {
+  Coupons: CouponWithRelations[];
+  user: UserWithRelations;
+};
+
+export type ClientWithRelations = z.infer<typeof ClientSchema> & ClientRelations
+
+export const ClientWithRelationsSchema: z.ZodType<ClientWithRelations> = ClientSchema.merge(z.object({
+  Coupons: z.lazy(() => CouponWithRelationsSchema).array(),
+  user: z.lazy(() => UserWithRelationsSchema),
+}))
+
+// CLIENT PARTIAL RELATION SCHEMA
+//------------------------------------------------------
+
+export type ClientPartialRelations = {
+  Coupons?: CouponPartialWithRelations[];
+  user?: UserPartialWithRelations;
+};
+
+export type ClientPartialWithRelations = z.infer<typeof ClientPartialSchema> & ClientPartialRelations
+
+export const ClientPartialWithRelationsSchema: z.ZodType<ClientPartialWithRelations> = ClientPartialSchema.merge(z.object({
+  Coupons: z.lazy(() => CouponPartialWithRelationsSchema).array(),
+  user: z.lazy(() => UserPartialWithRelationsSchema),
+})).partial()
+
+export type ClientWithPartialRelations = z.infer<typeof ClientSchema> & ClientPartialRelations
+
+export const ClientWithPartialRelationsSchema: z.ZodType<ClientWithPartialRelations> = ClientSchema.merge(z.object({
+  Coupons: z.lazy(() => CouponPartialWithRelationsSchema).array(),
+  user: z.lazy(() => UserPartialWithRelationsSchema),
+}).partial())
 
 /////////////////////////////////////////
 // EMPLOYEE SCHEMA
@@ -118,6 +313,51 @@ export const EmployeeSchema = z.object({
 export type Employee = z.infer<typeof EmployeeSchema>
 
 /////////////////////////////////////////
+// EMPLOYEE PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const EmployeePartialSchema = EmployeeSchema.partial()
+
+export type EmployeePartial = z.infer<typeof EmployeePartialSchema>
+
+// EMPLOYEE RELATION SCHEMA
+//------------------------------------------------------
+
+export type EmployeeRelations = {
+  user: UserWithRelations;
+  enterprise: EnterpriseWithRelations;
+};
+
+export type EmployeeWithRelations = z.infer<typeof EmployeeSchema> & EmployeeRelations
+
+export const EmployeeWithRelationsSchema: z.ZodType<EmployeeWithRelations> = EmployeeSchema.merge(z.object({
+  user: z.lazy(() => UserWithRelationsSchema),
+  enterprise: z.lazy(() => EnterpriseWithRelationsSchema),
+}))
+
+// EMPLOYEE PARTIAL RELATION SCHEMA
+//------------------------------------------------------
+
+export type EmployeePartialRelations = {
+  user?: UserPartialWithRelations;
+  enterprise?: EnterprisePartialWithRelations;
+};
+
+export type EmployeePartialWithRelations = z.infer<typeof EmployeePartialSchema> & EmployeePartialRelations
+
+export const EmployeePartialWithRelationsSchema: z.ZodType<EmployeePartialWithRelations> = EmployeePartialSchema.merge(z.object({
+  user: z.lazy(() => UserPartialWithRelationsSchema),
+  enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema),
+})).partial()
+
+export type EmployeeWithPartialRelations = z.infer<typeof EmployeeSchema> & EmployeePartialRelations
+
+export const EmployeeWithPartialRelationsSchema: z.ZodType<EmployeeWithPartialRelations> = EmployeeSchema.merge(z.object({
+  user: z.lazy(() => UserPartialWithRelationsSchema),
+  enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema),
+}).partial())
+
+/////////////////////////////////////////
 // ADMIN SCHEMA
 /////////////////////////////////////////
 
@@ -130,28 +370,113 @@ export const AdminSchema = z.object({
 export type Admin = z.infer<typeof AdminSchema>
 
 /////////////////////////////////////////
+// ADMIN PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const AdminPartialSchema = AdminSchema.partial()
+
+export type AdminPartial = z.infer<typeof AdminPartialSchema>
+
+// ADMIN RELATION SCHEMA
+//------------------------------------------------------
+
+export type AdminRelations = {
+  user: UserWithRelations;
+};
+
+export type AdminWithRelations = z.infer<typeof AdminSchema> & AdminRelations
+
+export const AdminWithRelationsSchema: z.ZodType<AdminWithRelations> = AdminSchema.merge(z.object({
+  user: z.lazy(() => UserWithRelationsSchema),
+}))
+
+// ADMIN PARTIAL RELATION SCHEMA
+//------------------------------------------------------
+
+export type AdminPartialRelations = {
+  user?: UserPartialWithRelations;
+};
+
+export type AdminPartialWithRelations = z.infer<typeof AdminPartialSchema> & AdminPartialRelations
+
+export const AdminPartialWithRelationsSchema: z.ZodType<AdminPartialWithRelations> = AdminPartialSchema.merge(z.object({
+  user: z.lazy(() => UserPartialWithRelationsSchema),
+})).partial()
+
+export type AdminWithPartialRelations = z.infer<typeof AdminSchema> & AdminPartialRelations
+
+export const AdminWithPartialRelationsSchema: z.ZodType<AdminWithPartialRelations> = AdminSchema.merge(z.object({
+  user: z.lazy(() => UserPartialWithRelationsSchema),
+}).partial())
+
+/////////////////////////////////////////
 // OFFER SCHEMA
 /////////////////////////////////////////
 
 export const OfferSchema = z.object({
   offerState: OfferStateSchema,
-  id: z.number().int().openapi({ description: 'The id of the offer' }),
-  title: z.string().openapi({ description: 'The title of the offer' }),
-  description: z.string().openapi({ description: 'The description of the offer' }),
-  originalPrice: z.number().openapi({ description: 'The original price of the offer' }),
-  discountPrice: z.number().openapi({ description: 'The discount price of the offer' }),
-  validFrom: z.coerce.date().openapi({ description: 'The date when the offer is valid from' }),
-  validUntil: z.coerce.date().openapi({ description: 'The date when the offer is valid until' }),
-  quantityLimit: z.number().int().nullable().openapi({ description: 'The quantity limit of the offer' }),
-  sold: z.number().int().nullable().openapi({ description: 'The quantity sold of the offer' }),
-  createdAt: z.coerce.date().openapi({ description: 'The date when the offer was created' }),
-  updatedAt: z.coerce.date().openapi({ description: 'The date when the offer was updated' }),
-  approvedAt: z.coerce.date().nullable().openapi({ description: 'The date when the offer was approved' }),
-  offerRejectedReason: z.string().nullable().openapi({ description: 'The reason why the offer was rejected' }),
-  enterpriseId: z.number().int().openapi({ description: 'The id of the enterprise' }),
+  id: z.number().int(),
+  title: z.string(),
+  description: z.string(),
+  originalPrice: z.number(),
+  discountPrice: z.number(),
+  validFrom: z.coerce.date(),
+  validUntil: z.coerce.date(),
+  quantityLimit: z.number().int().nullable(),
+  sold: z.number().int().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  approvedAt: z.coerce.date().nullable(),
+  offerRejectedReason: z.string().nullable(),
+  enterpriseId: z.number().int(),
 })
 
 export type Offer = z.infer<typeof OfferSchema>
+
+/////////////////////////////////////////
+// OFFER PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const OfferPartialSchema = OfferSchema.partial()
+
+export type OfferPartial = z.infer<typeof OfferPartialSchema>
+
+// OFFER RELATION SCHEMA
+//------------------------------------------------------
+
+export type OfferRelations = {
+  enterprise: EnterpriseWithRelations;
+  Coupon: CouponWithRelations[];
+};
+
+export type OfferWithRelations = z.infer<typeof OfferSchema> & OfferRelations
+
+export const OfferWithRelationsSchema: z.ZodType<OfferWithRelations> = OfferSchema.merge(z.object({
+  enterprise: z.lazy(() => EnterpriseWithRelationsSchema),
+  Coupon: z.lazy(() => CouponWithRelationsSchema).array(),
+}))
+
+// OFFER PARTIAL RELATION SCHEMA
+//------------------------------------------------------
+
+export type OfferPartialRelations = {
+  enterprise?: EnterprisePartialWithRelations;
+  Coupon?: CouponPartialWithRelations[];
+};
+
+export type OfferPartialWithRelations = z.infer<typeof OfferPartialSchema> & OfferPartialRelations
+
+export const OfferPartialWithRelationsSchema: z.ZodType<OfferPartialWithRelations> = OfferPartialSchema.merge(z.object({
+  enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema),
+  Coupon: z.lazy(() => CouponPartialWithRelationsSchema).array(),
+})).partial()
+
+export type OfferWithPartialRelations = z.infer<typeof OfferSchema> & OfferPartialRelations
+
+export const OfferWithPartialRelationsSchema: z.ZodType<OfferWithPartialRelations> = OfferSchema.merge(z.object({
+  enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema),
+  Coupon: z.lazy(() => CouponPartialWithRelationsSchema).array(),
+}).partial())
 
 /////////////////////////////////////////
 // COUPON SCHEMA
@@ -168,6 +493,51 @@ export const CouponSchema = z.object({
 })
 
 export type Coupon = z.infer<typeof CouponSchema>
+
+/////////////////////////////////////////
+// COUPON PARTIAL SCHEMA
+/////////////////////////////////////////
+
+export const CouponPartialSchema = CouponSchema.partial()
+
+export type CouponPartial = z.infer<typeof CouponPartialSchema>
+
+// COUPON RELATION SCHEMA
+//------------------------------------------------------
+
+export type CouponRelations = {
+  offerDetails: OfferWithRelations;
+  client: ClientWithRelations;
+};
+
+export type CouponWithRelations = z.infer<typeof CouponSchema> & CouponRelations
+
+export const CouponWithRelationsSchema: z.ZodType<CouponWithRelations> = CouponSchema.merge(z.object({
+  offerDetails: z.lazy(() => OfferWithRelationsSchema),
+  client: z.lazy(() => ClientWithRelationsSchema),
+}))
+
+// COUPON PARTIAL RELATION SCHEMA
+//------------------------------------------------------
+
+export type CouponPartialRelations = {
+  offerDetails?: OfferPartialWithRelations;
+  client?: ClientPartialWithRelations;
+};
+
+export type CouponPartialWithRelations = z.infer<typeof CouponPartialSchema> & CouponPartialRelations
+
+export const CouponPartialWithRelationsSchema: z.ZodType<CouponPartialWithRelations> = CouponPartialSchema.merge(z.object({
+  offerDetails: z.lazy(() => OfferPartialWithRelationsSchema),
+  client: z.lazy(() => ClientPartialWithRelationsSchema),
+})).partial()
+
+export type CouponWithPartialRelations = z.infer<typeof CouponSchema> & CouponPartialRelations
+
+export const CouponWithPartialRelationsSchema: z.ZodType<CouponWithPartialRelations> = CouponSchema.merge(z.object({
+  offerDetails: z.lazy(() => OfferPartialWithRelationsSchema),
+  client: z.lazy(() => ClientPartialWithRelationsSchema),
+}).partial())
 
 /////////////////////////////////////////
 // SELECT & INCLUDE

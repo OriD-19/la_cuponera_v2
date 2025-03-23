@@ -3,6 +3,9 @@ import login from './login';
 import offers from './offers';
 import adminOffers from './admin/offers';
 import register from './register';
+import employees from './employees';
+import adminClients from './admin/clients';
+import adminEnterprises from './admin/enterprises';
 import { Variables } from '../schemas/jwtVariables';
 import { apiReference } from "@scalar/hono-api-reference";
 import { openAPISpecs } from 'hono-openapi';
@@ -11,7 +14,7 @@ import { authorization, Role } from '../middleware/authorization';
 // for administrator only
 const adminApp = new Hono().basePath("/api/admin/v1");
 // authorization middleware for the administrator api
-adminApp.use(authorization(Role.ADMIN));
+adminApp.use("/*", authorization(Role.ADMIN));
 
 const app = new Hono<{ Variables: Variables }>().basePath("/api/v1");
 
@@ -19,11 +22,17 @@ app.route("/login", login);
 app.route("/offers", offers);
 app.route("/register", register);
 
+// protect the route of employees only for an enterprise
+app.use('/employees', authorization(Role.EMPLOYEE));
+app.route('/employees', employees);
+
 adminApp.route("/offers", adminOffers);
+adminApp.route("/clients", adminClients);
+adminApp.route("/enterprises", adminEnterprises);
 
 app.get("/", c => {
     return c.json("Hello world!");
-})
+});
 
 app.get("/openapi", openAPISpecs(app, {
     documentation: {
@@ -39,7 +48,7 @@ app.get("/openapi", openAPISpecs(app, {
             },
         ],
     },
-}))
+}));
 
 app.get("/docs", apiReference({
     theme: 'saturn',
