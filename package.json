@@ -9,6 +9,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
     "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
     "hono": "^4.7.4",
     "hono-openapi": "^0.4.6",
     "jsonwebtoken": "^9.0.2",

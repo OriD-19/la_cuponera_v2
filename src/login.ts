@@ -1,22 +1,131 @@
 import { Hono } from 'hono';
 import { sign } from "jsonwebtoken";
 
+import { config } from 'dotenv';
+import { zValidator } from '@hono/zod-validator';
+import { loginRequestSchema } from '../schemas/login';
+import { PrismaClient } from '@prisma/client';
+import { compare } from 'bcrypt';
+config();
+
+// prefix: /api/v1/login
 const app = new Hono();
+const prisma = new PrismaClient();
 
-app.post("/", (c) => {
+app.post("/", zValidator('json', loginRequestSchema), async (c) => {
+    const validated = c.req.valid('json');
+    const token_secret = process.env.TOKEN_SECRET;
 
-    const token = sign({
-        id: "123",
-        role: "admin",
-        email: "fernando@fernando.com"
-    }, "it-is-very-secret", {
-        expiresIn: "1h"
+    const user = await prisma.user.findUnique({
+        where: {
+            email: validated.email,
+        }
     });
+
+    if (!user) {
+        return c.json({
+            message: "incorrect user credentials",
+        }, 400);
+    }
+
+    // check password with bcrypt
+    const validPassword = await compare(validated.password, user.password);
+
+    if (!validPassword) {
+        return c.json({
+            message: "incorrect user credentials",
+        }, 400);
+    }
+
+    // switch the type of the user with each type of entity
+
+    const client = await prisma.client.findUnique({
+        where: {
+            userId: user.id,
+        }
+    });
+
+    if (client) {
+        const token = sign({
+            id: user.id,
+            role: "client",
+            email: user.email,
+        }, token_secret!, {
+            expiresIn: "6h"
+        });
+
+        return c.json({
+            message: "logged in successfully",
+            token,
+        });
+    }
+
+    const admin = await prisma.admin.findUnique({
+        where: {
+            userId: user.id,
+        }
+    });
+
+    if (admin) {
+        const token = sign({
+            id: user.id,
+            role: "admin",
+            email: user.email,
+        }, token_secret!, {
+            expiresIn: "6h"
+        });
+
+        return c.json({
+            message: "logged in successfully",
+            token,
+        });
+    }
+
+    const employee = await prisma.employee.findUnique({
+        where: {
+            userId: user.id,
+        }
+    });
+
+    if (employee) {
+        const token = sign({
+            id: user.id,
+            role: "employee",
+            email: user.email,
+        }, token_secret!, {
+            expiresIn: "6h"
+        });
+
+        return c.json({
+            message: "logged in successfully",
+            token,
+        });
+    }
+
+    const enterprise = await prisma.enterprise.findUnique({
+        where: {
+            userId: user.id,
+        }
+    });
+
+    if (enterprise) {
+        const token = sign({
+            id: user.id,
+            role: "enterprise",
+            email: user.email,
+        }, token_secret!, {
+            expiresIn: "6h"
+        });
+
+        return c.json({
+            message: "logged in successfully",
+            token,
+        });
+    }
 
     return c.json({
-        message: `Hello, stranger. Please login`,
-        auth_token: token
-    });
+        message: "unknown user type",
+    }, 500);
 });
 
 export default app;

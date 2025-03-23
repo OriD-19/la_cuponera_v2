@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { jwt } from 'hono/jwt';
 import { Variables } from '../schemas/jwtVariables';
 import { zValidator } from '@hono/zod-validator';
 import { registerClientRequestSchema, registerEmployeeRequestSchema, registerEnterpriseRequestSchema } from '../schemas/register';
@@ -52,6 +53,9 @@ app.post("/client",
 
 // admin only
 app.post("/enterprise",
+    jwt({
+        secret: process.env.TOKEN_SECRET!,
+    }),
     authorization(Role.ADMIN),
     zValidator('json', registerEnterpriseRequestSchema),
     async c => {
@@ -97,6 +101,9 @@ app.post("/enterprise",
 
 // enterprise admin only
 app.post('/employee',
+    jwt({
+        secret: process.env.TOKEN_SECRET!
+    }),
     authorization(Role.ENTERPRISE),
     zValidator('json', registerEmployeeRequestSchema),
     async c => {
