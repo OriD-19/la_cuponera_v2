@@ -97,6 +97,7 @@ export const getOfferDetailsSchema = z.object({
 
 export const createOfferSchema = z.object({
     // get the enterprise information from the JWT token in the route controller
+    // by default, all the offers are in the PENDING state
     title: z.string(),
     description: z.string(),
     originalPrice: z.number(),
@@ -117,4 +118,13 @@ export const updateOfferSchema = z.object({
     validUntil: z.date().nullable(),
     quantityLimit: z.number().nullable(),
     categoryId: z.number().nullable(),
+});
+
+export const approveOfferSchema = z.object({
+    offerId: z.number(),
+});
+
+export const rejectOfferSchema = z.object({
+    offerId: z.number(),
+    reason: z.string(),
 });
