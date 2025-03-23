@@ -5,6 +5,9 @@ import { jwt } from 'hono/jwt';
 import { describeRoute } from 'hono-openapi';
 import { Variables } from '../schemas/jwtVariables';
 import { deleteEmployeeDocs, updateEmployeeDocs } from '../documentation/employees.docs';
+import { validator as zValidator } from "hono-openapi/zod";
+import { updateEmployeeRequestSchema } from '../schemas/employees';
+import { hash } from 'bcrypt';
 
 // prefix: /api/v1/employees
 const app = new Hono<{ Variables: Variables }>();
@@ -16,7 +19,10 @@ app.patch(
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
+    zValidator('json', updateEmployeeRequestSchema),
     async c => {
+
+        const validated = c.req.valid('json');
 
         const enterpriseId = parseInt(c.get('jwtPayload').id);
         const employeeId = c.req.param('employeeId');
@@ -39,12 +45,16 @@ app.patch(
             }, 403);
         }
 
+        if (validated.password) {
+            validated.password = await hash(validated.password, 10);
+        }
+
         await prisma.employee.update({
             where: {
                 id: parseInt(employeeId),
             },
             data: {
-                // update fields
+                ...validated,
             },
         });
 
