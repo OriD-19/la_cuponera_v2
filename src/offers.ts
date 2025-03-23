@@ -5,10 +5,10 @@ import { Variables } from '../schemas/jwtVariables';
 import "dotenv/config";
 import { authorization, Role } from '../middleware/authorization';
 import { validator as zValidator } from 'hono-openapi/zod';
-import { createOfferRequestSchema, getOffersResponseSchema } from '../schemas/offers';
+import { createOfferRequestSchema, getOffersResponseSchema, updateOfferRequestSchema } from '../schemas/offers';
 import { OfferState, PrismaClient } from '@prisma/client';
 import { describeRoute } from 'hono-openapi';
-import { createOfferDocs, getOfferDocs, getOffersDocs } from '../documentation/offers.docs';
+import { createOfferDocs, getOfferDocs, getOffersDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
 
 // prefix: /api/v1/offers
 const app = new Hono<{ Variables: Variables }>();
@@ -53,6 +53,63 @@ app.post(
         return c.json({
             message: "offer created successfully, waiting for approval",
         }, 201);
+    });
+
+app.patch(
+    '/:offerId',
+    describeRoute(updateOfferRequestDocs),
+    jwt({
+        secret: process.env.TOKEN_SECRET!
+    }),
+    authorization(Role.ENTERPRISE),
+    zValidator('json', updateOfferRequestSchema),
+    async c => {
+
+        const validated = c.req.valid('json');
+        const enterpriseId = c.get('jwtPayload').id;
+        const offerId = c.req.param('offerId');
+
+        const offer = await prisma.offer.findFirst({
+            where: {
+                id: parseInt(offerId),
+                enterpriseId: parseInt(enterpriseId),
+            },
+        });
+
+        if (!offer) {
+            return c.json({
+                message: "offer not found",
+            }, 404);
+        }
+
+        try {
+            await prisma.offer.update({
+                where: {
+                    id: parseInt(offerId),
+                },
+                data: {
+                    title: validated.title,
+                    description: validated.description,
+                    originalPrice: validated.originalPrice,
+                    discountPrice: validated.discountPrice,
+                    validFrom: validated.validFrom,
+                    validUntil: validated.validUntil,
+                    quantityLimit: validated.quantityLimit,
+
+                    // reset state to pending
+                    offerState: OfferState.PENDING,
+                },
+            });
+
+        } catch (err) {
+            return c.json({
+                message: "could not update offer with provided information",
+            }, 400);
+        }
+
+        return c.json({
+            message: "offer updated successfully",
+        });
     });
 
 app.get(
