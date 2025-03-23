@@ -6,6 +6,7 @@
   "dependencies": {
     "@hono/zod-validator": "^0.4.3",
     "@prisma/client": "^6.5.0",
+    "@scalar/hono-api-reference": "^0.7.2",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
     "bcrypt": "^5.1.1",
@@ -14,7 +15,9 @@
     "hono-openapi": "^0.4.6",
     "jsonwebtoken": "^9.0.2",
     "zod": "^3.24.2",
-    "zod-openapi": "^4.2.3"
+    "zod-openapi": "^4.2.3",
+    "zod-prisma": "^0.5.4",
+    "zod-prisma-types": "^3.2.4"
   },
   "devDependencies": {
     "@types/bun": "latest",

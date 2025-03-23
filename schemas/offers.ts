@@ -95,7 +95,7 @@ export const getOfferDetailsSchema = z.object({
     }),
 });
 
-export const createOfferSchema = z.object({
+export const createOfferRequestSchema = z.object({
     // get the enterprise information from the JWT token in the route controller
     // by default, all the offers are in the PENDING state
     title: z.string(),
@@ -108,7 +108,7 @@ export const createOfferSchema = z.object({
     categoryId: z.number(),
 });
 
-export const updateOfferSchema = z.object({
+export const updateOfferRequestSchema = z.object({
     // all fields are optional, since it is a PATCH request
     title: z.string().nullable(),
     description: z.string().nullable(),
