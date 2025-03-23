@@ -4,6 +4,8 @@ import offers from './offers';
 import adminOffers from './admin/offers';
 import register from './register';
 import employees from './employees';
+import adminClients from './admin/clients';
+import adminEnterprises from './admin/enterprises';
 import { Variables } from '../schemas/jwtVariables';
 import { apiReference } from "@scalar/hono-api-reference";
 import { openAPISpecs } from 'hono-openapi';
@@ -25,6 +27,8 @@ app.use('/employees', authorization(Role.EMPLOYEE));
 app.route('/employees', employees);
 
 adminApp.route("/offers", adminOffers);
+adminApp.route("/clients", adminClients);
+adminApp.route("/enterprises", adminEnterprises);
 
 app.get("/", c => {
     return c.json("Hello world!");
