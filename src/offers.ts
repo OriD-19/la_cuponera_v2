@@ -4,11 +4,11 @@ import { Variables } from '../schemas/jwtVariables';
 
 import "dotenv/config";
 import { authorization, Role } from '../middleware/authorization';
-import { zValidator } from '@hono/zod-validator';
-import { createOfferRequestSchema } from '../schemas/offers';
+import { validator as zValidator } from 'hono-openapi/zod';
+import { createOfferRequestSchema, getOffersResponseSchema } from '../schemas/offers';
 import { OfferState, PrismaClient } from '@prisma/client';
 import { describeRoute } from 'hono-openapi';
-import { createOfferDocs } from '../documentation/offers.docs';
+import { createOfferDocs, getOffersDocs } from '../documentation/offers.docs';
 
 // prefix: /api/v1/offers
 const app = new Hono<{ Variables: Variables }>();
@@ -57,6 +57,7 @@ app.post(
 
 app.get(
     "/",
+    describeRoute(getOffersDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
@@ -75,4 +76,5 @@ app.get(
             });
     }
 );
+
 export default app;

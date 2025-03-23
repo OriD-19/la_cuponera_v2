@@ -2,13 +2,17 @@ import { DescribeRouteOptions } from "hono-openapi";
 import { resolver } from "hono-openapi/zod";
 import { createOfferRequestSchema, getOffersResponseSchema } from "../schemas/offers";
 import { OfferSchema } from "../prisma/generated/zod";
+import { z } from "zod";
 
 export const createOfferDocs: DescribeRouteOptions = {
     description: "Create a new offer",
-    body: {
+    requestParams: {
+        header: z.object({'Authorization': z.string()}),
+    },
+    requestBody: {
         content: {
             "application/json": {
-                schema: resolver(createOfferRequestSchema)
+                schema: resolver(createOfferRequestSchema),
             }
         }
     },
@@ -53,15 +57,9 @@ export const getOffersDocs: DescribeRouteOptions = {
             description: "offers retrieved successfully",
             content: {
                 "application/json": {
-                    schema: {
-                        type: "array",
-                        properties: {
-                            offers: resolver(OfferSchema),
-                            type: "object",
-                        }
-                    }
-                }
-            }
-        }
-    }
+                    schema: resolver(z.array(OfferSchema)),
+                },
+            },
+        },
+    },
 };
