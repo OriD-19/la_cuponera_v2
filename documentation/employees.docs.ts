@@ -1,24 +1,23 @@
 import { DescribeRouteOptions } from "hono-openapi";
+import { updateEmployeeRequestSchema } from "../schemas/employees";
 import { resolver } from "hono-openapi/zod";
-import { createOfferRequestSchema, updateOfferRequestSchema } from "../schemas/offers";
-import { OfferSchema } from "../prisma/generated/zod";
-import { z } from "zod";
+import { z } from 'zod';
 
-export const createOfferDocs: DescribeRouteOptions = {
-    description: "Create a new offer",
+export const updateEmployeeDocs: DescribeRouteOptions = {
+    description: "Update an employee",
     requestParams: {
-        header: z.object({'Authorization': z.string()}),
+        header: z.object({ 'Authorization': z.string() }),
     },
     requestBody: {
         content: {
             "application/json": {
-                schema: resolver(createOfferRequestSchema),
+                schema: resolver(updateEmployeeRequestSchema),
             }
         }
     },
     responses: {
-        201: {
-            description: "offer created successfully, waiting for approval",
+        200: {
+            description: "employee updated successfully",
             content: {
                 "application/json": {
                     schema: {
@@ -26,62 +25,15 @@ export const createOfferDocs: DescribeRouteOptions = {
                         properties: {
                             message: {
                                 type: "string",
-                                example: "offer created successfully, waiting for approval",
+                                example: "employee with id 1 updated successfully",
                             },
                         },
                     },
-                },
-            },
-        },
-        400: {
-            description: "could not create offer with provided information",
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            message: {
-                                type: "string",
-                                example: "could not create offer with provided information",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-    }
-};
-
-export const getOffersDocs: DescribeRouteOptions = {
-    description: "Get all offers",
-    responses: {
-        200: {
-            description: "offers retrieved successfully",
-            content: {
-                "application/json": {
-                    schema: resolver(z.array(OfferSchema)),
-                },
-            },
-        },
-    },
-};
-
-export const getOfferDocs: DescribeRouteOptions = {
-    description: "Get a specific offer",
-    requestParams: {
-        header: z.object({'Authorization': z.string()}),
-    },
-    responses: {
-        200: {
-            description: "offer retrieved successfully",
-            content: {
-                "application/json": {
-                    schema: resolver(OfferSchema),
                 },
             },
         },
         404: {
-            description: "offer not found",
+            description: "employee not found",
             content: {
                 "application/json": {
                     schema: {
@@ -89,7 +41,23 @@ export const getOfferDocs: DescribeRouteOptions = {
                         properties: {
                             message: {
                                 type: "string",
-                                example: "offer not found",
+                                example: "employee not found",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        403: {
+            description: "cannot update employee from another enterprise",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "cannot update employee from another enterprise", 
                             },
                         },
                     },
@@ -99,22 +67,15 @@ export const getOfferDocs: DescribeRouteOptions = {
     },
 };
 
-export const updateOfferRequestDocs: DescribeRouteOptions = {
-    description: "Update a specific offer",
+export const deleteEmployeeDocs: DescribeRouteOptions = {
+    description: "Delete an employee",
     requestParams: {
-        header: z.object({'Authorization': z.string()}),
-        route: z.object({ offerId: z.string() }),
-    },
-    requestBody: {
-        content: {
-            "application/json": {
-                schema: resolver(updateOfferRequestSchema),
-            }
-        }
+        header: z.object({ 'Authorization': z.string() }),
+        route: z.object({ employeeId: z.string() }),
     },
     responses: {
         200: {
-            description: "offer updated successfully",
+            description: "employee deleted successfully",
             content: {
                 "application/json": {
                     schema: {
@@ -122,15 +83,15 @@ export const updateOfferRequestDocs: DescribeRouteOptions = {
                         properties: {
                             message: {
                                 type: "string",
-                                example: "offer with id 1 updated successfully",
+                                example: "employee with id 1 deleted successfully",
                             },
                         },
                     },
                 },
             },
         },
-        400: {
-            description: "could not update offer with provided information",
+        404: {
+            description: "employee not found",
             content: {
                 "application/json": {
                     schema: {
@@ -138,7 +99,23 @@ export const updateOfferRequestDocs: DescribeRouteOptions = {
                         properties: {
                             message: {
                                 type: "string",
-                                example: "could not update offer with provided information",
+                                example: "employee not found",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        403: {
+            description: "cannot delete employee from another enterprise",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "cannot delete employee from another enterprise",
                             },
                         },
                     },
