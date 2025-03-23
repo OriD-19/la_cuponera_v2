@@ -125,6 +125,5 @@ export const approveOfferSchema = z.object({
 }).openapi({ description: "Schema for approving an offer" });
 
 export const rejectOfferSchema = z.object({
-    offerId: z.number().openapi({ description: "The unique identifier of the offer to reject", example: 1 }),
     reason: z.string().openapi({ description: "The reason for rejecting the offer", example: "Insufficient details provided" }),
 }).openapi({ description: "Schema for rejecting an offer" });
