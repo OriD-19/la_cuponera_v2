@@ -57,7 +57,7 @@ export const updateEmployeeDocs: DescribeRouteOptions = {
                         properties: {
                             message: {
                                 type: "string",
-                                example: "cannot update employee from another enterprise", 
+                                example: "cannot update employee from another enterprise",
                             },
                         },
                     },

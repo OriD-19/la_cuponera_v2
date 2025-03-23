@@ -45,3 +45,11 @@ export const getClientsResponseSchema = z.object({
         })
     ),
 });
+
+export const updateProfileRequestSchema = z.object({
+    firstName: z.string().optional().openapi({ description: "The first name of the client (optional)", example: "John" }),
+    lastName: z.string().optional().openapi({ description: "The last name of the client (optional)", example: "Doe" }),
+    phone: z.string().optional().openapi({ description: "The phone number of the client (optional)", example: "+1234567890" }),
+    email: z.string().email().optional().openapi({ description: "The email address of the client (optional)", example: "fernando@fernando.com" }),
+    password: z.string().optional().openapi({ description: "The password for the client account (optional)", example: "securePassword123" }),
+});
