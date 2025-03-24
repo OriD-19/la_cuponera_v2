@@ -147,3 +147,49 @@ export const updateOfferRequestDocs: DescribeRouteOptions = {
         },
     },
 };
+
+export const buyCouponDocs: DescribeRouteOptions = {
+    description: "Buy a coupon",
+    requestParams: {
+        header: z.object({'Authorization': z.string()}),
+        route: z.object({ offerId: z.string() }),
+    },
+    responses: {
+        201: {
+            description: "coupon bought successfully",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "coupon bought successfully",
+                            }, 
+                            couponCode: {
+                                type: "string",
+                                example: "ABC1230000001",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        400: {
+            description: "could not buy coupon",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "could not buy coupon",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+};

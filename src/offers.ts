@@ -8,7 +8,7 @@ import { validator as zValidator } from 'hono-openapi/zod';
 import { createOfferRequestSchema, getOffersResponseSchema, updateOfferRequestSchema } from '../schemas/offers';
 import { CouponState, OfferState, PrismaClient } from '@prisma/client';
 import { describeRoute } from 'hono-openapi';
-import { createOfferDocs, getOfferDocs, getOffersDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
+import { buyCouponDocs, createOfferDocs, getOfferDocs, getOffersDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
 
 // prefix: /api/v1/offers
 const app = new Hono<{ Variables: Variables }>();
@@ -162,8 +162,10 @@ app.get(
         });
     });
 
+// buy an offer/generate a coupon
 app.post(
     "/:offerId/buy",
+    describeRoute(buyCouponDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
@@ -225,7 +227,7 @@ app.post(
 
         return c.json({
             message: "coupon bought",
-            coupon: coupon,
+            couponCode: coupon.code,
         }, 201);
     });
 
