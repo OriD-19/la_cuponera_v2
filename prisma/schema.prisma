@@ -6,8 +6,8 @@ generator client {
 }
 
 generator zod {
-  provider = "zod-prisma-types"
-  createPartialTypes = true
+  provider                  = "zod-prisma-types"
+  createPartialTypes        = true
   createRelationValuesTypes = true
 }
 
@@ -18,7 +18,7 @@ datasource db {
 
 model Category {
   id          Int      @id @default(autoincrement())
-  name        String
+  name        String   @unique
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
