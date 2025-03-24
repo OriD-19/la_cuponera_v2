@@ -53,7 +53,7 @@ app.post(
 
         if (client) {
             const token = sign({
-                id: user.id,
+                id: client.id,
                 role: "client",
                 email: user.email,
             }, token_secret!, {
@@ -74,7 +74,7 @@ app.post(
 
         if (admin) {
             const token = sign({
-                id: user.id,
+                id: admin.id,
                 role: "admin",
                 email: user.email,
             }, token_secret!, {
@@ -95,7 +95,7 @@ app.post(
 
         if (employee) {
             const token = sign({
-                id: user.id,
+                id: employee.id,
                 role: "employee",
                 email: user.email,
             }, token_secret!, {
@@ -116,7 +116,7 @@ app.post(
 
         if (enterprise) {
             const token = sign({
-                id: user.id,
+                id: enterprise.id,
                 role: "enterprise",
                 email: user.email,
             }, token_secret!, {
