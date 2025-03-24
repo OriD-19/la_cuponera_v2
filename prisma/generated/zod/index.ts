@@ -198,10 +198,10 @@ export type EnterprisePartial = z.infer<typeof EnterprisePartialSchema>
 //------------------------------------------------------
 
 export type EnterpriseRelations = {
-  user: UserWithRelations;
-  Offer: OfferWithRelations[];
-  Employee: EmployeeWithRelations[];
-  Category?: CategoryWithRelations | null;
+  user: User;
+  Offer: Offer[];
+  Employee: Employee[];
+  Category?: Category | null;
 };
 
 export type EnterpriseWithRelations = z.infer<typeof EnterpriseSchema> & EnterpriseRelations
@@ -414,21 +414,21 @@ export const AdminWithPartialRelationsSchema: z.ZodType<AdminWithPartialRelation
 /////////////////////////////////////////
 
 export const OfferSchema = z.object({
-  offerState: OfferStateSchema,
-  id: z.number().int(),
-  title: z.string(),
-  description: z.string(),
-  originalPrice: z.number(),
-  discountPrice: z.number(),
-  validFrom: z.coerce.date(),
-  validUntil: z.coerce.date(),
-  quantityLimit: z.number().int().nullable(),
-  sold: z.number().int().nullable(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  approvedAt: z.coerce.date().nullable(),
-  offerRejectedReason: z.string().nullable(),
-  enterpriseId: z.number().int(),
+  offerState: OfferStateSchema.openapi({ description: "The state of the offer", example: "PENDING" }),
+  id: z.number().int().openapi({ description: "The ID of the offer", example: 1 }),
+  title: z.string().openapi({ description: "The title of the offer", example: "Offer Title" }),
+  description: z.string().openapi({ description: "The description of the offer", example: "Offer Description" }),
+  originalPrice: z.number().openapi({ description: "The original price of the offer", example: 100 }),
+  discountPrice: z.number().openapi({ description: "The discount price of the offer", example: 50 }),
+  validFrom: z.coerce.date().openapi({ description: "The date when the offer is valid from", example: "2021-10-01T00:00:00.000Z" }),
+  validUntil: z.coerce.date().openapi({ description: "The date when the offer is valid until", example: "2021-10-01T00:00:00.000Z" }),
+  quantityLimit: z.number().int().nullable().openapi({ description: "The quantity limit of the offer", example: 100 }),
+  sold: z.number().int().nullable().openapi({ description: "The quantity sold of the offer", example: 50 }),
+  createdAt: z.coerce.date().openapi({ description: "The date when the offer was created", example: "2021-10-01T00:00:00.000Z" }),
+  updatedAt: z.coerce.date().openapi({ description: "The date when the offer was last updated", example: "2021-10-01T00:00:00.000Z" }),
+  approvedAt: z.coerce.date().nullable().openapi({ description: "The date when the offer was approved", example: "2021-10-01T00:00:00.000Z" }),
+  offerRejectedReason: z.string().nullable().openapi({ description: "The reason why the offer was rejected", example: "Offer Rejected Reason" }),
+  enterpriseId: z.number().int().openapi({ description: "The ID of the enterprise associated with the offer", example: 1 }),
 })
 
 export type Offer = z.infer<typeof OfferSchema>
@@ -445,8 +445,8 @@ export type OfferPartial = z.infer<typeof OfferPartialSchema>
 //------------------------------------------------------
 
 export type OfferRelations = {
-  enterprise: EnterpriseWithRelations;
-  Coupon: CouponWithRelations[];
+  enterprise: Enterprise;
+  Coupon: Coupon[];
 };
 
 export type OfferWithRelations = z.infer<typeof OfferSchema> & OfferRelations
@@ -484,12 +484,12 @@ export const OfferWithPartialRelationsSchema: z.ZodType<OfferWithPartialRelation
 
 export const CouponSchema = z.object({
   couponState: CouponStateSchema,
-  id: z.number().int(),
-  code: z.string(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  offerId: z.number().int(),
-  clientId: z.number().int(),
+  id: z.number().int().openapi({ description: "The ID of the coupon", example: 1 }),
+  code: z.string().openapi({ description: "The code of the coupon", example: "ABC1230000000" }),
+  createdAt: z.coerce.date().openapi({ description: "The date when the coupon was created", example: "2021-10-01T00:00:00.000Z" }),
+  updatedAt: z.coerce.date().openapi({ description: "The date when the coupon was last updated", example: "2021-10-01T00:00:00.000Z" }),
+  offerId: z.number().int().openapi({ description: "The ID of the offer associated with the coupon", example: 1 }),
+  clientId: z.number().int().openapi({ description: "The ID of the client who owns the coupon", example: 1 }),
 })
 
 export type Coupon = z.infer<typeof CouponSchema>
@@ -506,8 +506,8 @@ export type CouponPartial = z.infer<typeof CouponPartialSchema>
 //------------------------------------------------------
 
 export type CouponRelations = {
-  offerDetails: OfferWithRelations;
-  client: ClientWithRelations;
+  offerDetails: Offer;
+  client: Client;
 };
 
 export type CouponWithRelations = z.infer<typeof CouponSchema> & CouponRelations
