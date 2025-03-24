@@ -4,7 +4,7 @@ import "dotenv/config";
 import { jwt } from 'hono/jwt';
 import { Variables } from 'hono/types';
 import { describeRoute } from 'hono-openapi';
-import { getCouponsDocs } from '../documentation/coupons.docs';
+import { getCouponDocs, getCouponsDocs } from '../documentation/coupons.docs';
 import { authorization, Role } from '../middleware/authorization';
 
 // prefix: /api/v1/coupons
@@ -44,6 +44,7 @@ app.get(
 // get coupon details
 app.get(
     "/:couponId",
+    describeRoute(getCouponDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),

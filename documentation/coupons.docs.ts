@@ -1,7 +1,7 @@
 import { DescribeRouteOptions } from "hono-openapi";
 import { resolver } from "hono-openapi/zod";
 import { z } from 'zod';
-import { CouponWithPartialRelationsSchema } from "../prisma/generated/zod";
+import { CouponWithRelationsSchema } from "../prisma/generated/zod";
 
 export const getCouponsDocs: DescribeRouteOptions = {
     description: "Get all coupons available in the system",
@@ -10,7 +10,7 @@ export const getCouponsDocs: DescribeRouteOptions = {
             description: "Success",
             content: {
                 "application/json": {
-                    schema: resolver(z.array(CouponWithPartialRelationsSchema)),
+                    schema: resolver(z.array(CouponWithRelationsSchema)),
                 },
             },
         },
@@ -24,7 +24,7 @@ export const getCouponDocs: DescribeRouteOptions = {
             description: "Success",
             content: {
                 "application/json": {
-                    schema: resolver(CouponWithPartialRelationsSchema),
+                    schema: resolver(CouponWithRelationsSchema),
                 },
             },
         },

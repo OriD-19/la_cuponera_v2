@@ -39,7 +39,7 @@ app.get("/", c => {
 app.get("/openapi", openAPISpecs(app, {
     documentation: {
         info: {
-            title: "Offers API",
+            title: "La Cuponera API",
             description: "API for managing offers",
             version: "1.0.0",
         },
