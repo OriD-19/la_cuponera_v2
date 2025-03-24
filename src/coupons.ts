@@ -43,7 +43,7 @@ app.get(
 
 // get coupon details
 app.get(
-    "/:couponId",
+    "/:couponCode",
     describeRoute(getCouponDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!,
@@ -52,11 +52,11 @@ app.get(
     async c => {
 
         const clientId = parseInt(c.get('jwtPayload').id);
-        const couponId = c.req.param('couponId');
+        const couponCode = c.req.param('couponCode');
 
         const coupon = await prisma.coupon.findUnique({
             where: {
-                id: parseInt(couponId),
+                code: couponCode,
                 clientId: clientId,
             },
             include: {
@@ -80,14 +80,14 @@ app.get(
 
 // only employees can redeem a coupon
 app.post(
-    '/:couponId/redeem', 
+    '/:couponCode/redeem', 
     describeRoute(redeemCouponDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
     authorization(Role.EMPLOYEE),
     async c => {
-        const couponId = c.req.param('couponId');
+        const couponCode = c.req.param('couponCode');
 
         const employeeId = parseInt(c.get('jwtPayload').id);
 
@@ -105,7 +105,7 @@ app.post(
 
         const coupon = await prisma.coupon.findFirst({
             where: {
-                id: parseInt(couponId),
+                code: couponCode,
             },
             include: {
                offerDetails: true, 
@@ -126,7 +126,7 @@ app.post(
 
         await prisma.coupon.update({
             where: {
-                id: parseInt(couponId),
+                id: parseInt(couponCode),
             },
             data: {
                 couponState: 'USED',
