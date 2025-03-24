@@ -16,12 +16,26 @@ async function main() {
         });
     }
 
+    await prisma.admin.create({
+        data: {
+            user: {
+                create: {
+                    firstName: faker.person.firstName(),
+                    lastName: faker.person.lastName(),
+                    email: "admin@admin.com",
+                    password: "$2a$12$AwhGLAMrS3qXtufrTVt4SOOIRd1/X.PaUaytjHtjGUl2RrdPMcqDO", // micontrasenia
+                }
+            },
+            phone: faker.phone.number(),
+        }
+    })
+
     await prisma.enterprise.create({
         data: {
             user: {
                 create: {
                     firstName: faker.company.name(),
-                    email: faker.internet.email(),
+                    email: "enterprise@enterprise.com",
                     password: "$2a$12$AwhGLAMrS3qXtufrTVt4SOOIRd1/X.PaUaytjHtjGUl2RrdPMcqDO", // micontrasenia
                 }
             },
@@ -52,10 +66,25 @@ async function main() {
                 validFrom: faker.date.recent(),
                 validUntil: faker.date.future(),
                 quantityLimit: faker.number.int({ min: 100, max: 300 }),
-                enterpriseId: 1,
+
+                enterprise: {
+                    connect: {
+                        id: 1,
+                    }
+                },
+
                 offerState: offerStates[Math.floor(Math.random() * offerStates.length)],
             }
         });
     }
 
 }
+main()
+    .then(async () => {
+        await prisma.$disconnect()
+    })
+    .catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    });
