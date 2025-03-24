@@ -21,7 +21,7 @@ app.post(
     async c => {
 
         const validated = c.req.valid('json');
-        const passwordHash = await hash(validated.password, 10);
+        const passwordHash = await hash(validated.password, 12);
 
         try {
             await prisma.client.create({
@@ -69,7 +69,7 @@ app.post(
         const validated = c.req.valid('json');
 
         const enterpriseCode = validated.firstName
-        const passwordHash = await hash(validated.password, 10);
+        const passwordHash = await hash(validated.password, 12);
 
         try {
             await prisma.enterprise.create({
@@ -117,7 +117,7 @@ app.post(
     async c => {
 
         const validated = c.req.valid('json');
-        const passwordHash = await hash(validated.password, 10);
+        const passwordHash = await hash(validated.password, 12);
 
         try {
             await prisma.employee.create({
