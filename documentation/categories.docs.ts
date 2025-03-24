@@ -1,5 +1,22 @@
 import { DescribeRouteOptions } from "hono-openapi";
 import { z } from "zod";
+import { CategorySchema } from "../prisma/generated/zod";
+
+export const getCategoriesDocs: DescribeRouteOptions = {
+    description: "Get all categories",
+    responses: {
+        200: {
+            description: "categories retrieved successfully",
+            content: {
+                "application/json": {
+                    schema: z.object({
+                        categories: z.array(CategorySchema),
+                    }),
+                },
+            },
+        },
+    },
+};
 
 export const createCategoryDocs: DescribeRouteOptions = {
     description: "Create a new category",
