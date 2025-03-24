@@ -115,9 +115,23 @@ app.patch(
 app.get(
     "/",
     describeRoute(getOffersDocs),
+    async c => {
+
+        const offers = await prisma.offer.findMany();
+
+        return c.json({
+            offers: offers,
+        });
+    }
+);
+
+app.get(
+    "/enterprise",
+    describeRoute(getOffersDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
+    authorization(Role.ENTERPRISE),
     async c => {
         const enterpriseId = c.get('jwtPayload').id;
 
@@ -130,16 +144,12 @@ app.get(
         return c.json({
             offers: offers,
         });
-    }
-);
+    });
 
 // for all users
 app.get(
     '/:id',
     describeRoute(getOfferDocs),
-    jwt({
-        secret: process.env.TOKEN_SECRET!
-    }),
     async c => {
 
         const offerId = c.req.param('id');

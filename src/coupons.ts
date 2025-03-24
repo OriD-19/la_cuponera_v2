@@ -4,7 +4,7 @@ import "dotenv/config";
 import { jwt } from 'hono/jwt';
 import { Variables } from 'hono/types';
 import { describeRoute } from 'hono-openapi';
-import { getCouponDocs, getCouponsDocs } from '../documentation/coupons.docs';
+import { getCouponDocs, getCouponsDocs, redeemCouponDocs } from '../documentation/coupons.docs';
 import { authorization, Role } from '../middleware/authorization';
 
 // prefix: /api/v1/coupons
@@ -76,5 +76,67 @@ app.get(
 
         return c.json(coupon);
     });
+
+
+// only employees can redeem a coupon
+app.post(
+    '/:couponId/redeem', 
+    describeRoute(redeemCouponDocs),
+    jwt({
+        secret: process.env.TOKEN_SECRET!,
+    }),
+    authorization(Role.EMPLOYEE),
+    async c => {
+        const couponId = c.req.param('couponId');
+
+        const employeeId = parseInt(c.get('jwtPayload').id);
+
+        const employee = await prisma.employee.findFirst({
+            where: {
+                id: employeeId,
+            },
+        });
+
+        if (!employee) {
+            return c.json({
+                message: "employee not found",
+            }, 404);
+        }
+
+        const coupon = await prisma.coupon.findFirst({
+            where: {
+                id: parseInt(couponId),
+            },
+            include: {
+               offerDetails: true, 
+            }
+        });
+
+        if (!coupon) {
+            return c.json({
+                message: "coupon not found",
+            }, 404);
+        }
+
+        if (coupon.offerDetails.enterpriseId !== employee.enterpriseId) {
+            return c.json({
+                message: "you are not authorized to redeem this coupon",
+            }, 403);
+        }
+
+        await prisma.coupon.update({
+            where: {
+                id: parseInt(couponId),
+            },
+            data: {
+                couponState: 'USED',
+            },
+        });
+
+        return c.json({
+            message: "coupon redeemed successfully",
+        });
+    }
+)
 
 export default app;
