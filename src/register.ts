@@ -1,5 +1,4 @@
-import { Hono } from 'hono';
-import { jwt } from 'hono/jwt';
+import { Hono } from 'hono'; import { jwt } from 'hono/jwt';
 import { Variables } from '../schemas/jwtVariables';
 import { validator as zValidator } from 'hono-openapi/zod';
 import { registerClientRequestSchema, registerEmployeeRequestSchema, registerEnterpriseRequestSchema } from '../schemas/register';

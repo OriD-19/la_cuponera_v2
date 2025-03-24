@@ -350,4 +350,50 @@ app.post(
         }, 201);
     });
 
+app.get(
+    '/category/:categoryId',
+    async c => {
+
+        const categoryId = c.req.param('categoryId');
+        const offset = c.req.query("offset") ?? "0";
+        const limit = c.req.query("limit") ?? "10";
+
+        const totalOffers = await prisma.offer.count({
+            where: {
+                enterprise: {
+                    categoryId: parseInt(categoryId),
+                }
+            }
+        });
+
+        const numPages = Math.ceil(totalOffers / parseInt(limit));
+
+        const offers = await prisma.offer.findMany({
+            skip: parseInt(offset),
+            take: parseInt(limit),
+            where: {
+                enterprise: {
+                    categoryId: parseInt(categoryId),
+                }
+            }
+        });
+
+        const basePath = c.req.url.split("?")[0];
+
+        return c.json({
+            offers: offers,
+            next: (
+                parseInt(offset) + parseInt(limit) >= totalOffers
+                    ? null
+                    : `${basePath}?offset=${parseInt(offset) + parseInt(limit)}&limit=${limit}`
+            ),
+            prev: (
+                parseInt(offset) - parseInt(limit) < 0
+                    ? null
+                    : `${basePath}?offset=${parseInt(offset) - parseInt(limit)}&limit=${limit}`
+            ),
+            numPages: numPages,
+        });
+    });
+
 export default app;

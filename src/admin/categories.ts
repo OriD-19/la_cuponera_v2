@@ -61,3 +61,5 @@ app.patch(
         }
     }
 );
+
+export default app;
