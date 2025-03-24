@@ -13,6 +13,24 @@ app.patch(
     async c => {
         const offerId = c.req.param('offerId');
 
+        const offer = await prisma.offer.findUnique({
+            where: {
+                id: parseInt(offerId),
+            },
+        });
+
+        if (!offer) {
+            return c.json({
+                message: "offer not found",
+            }, 404);
+        }
+
+        if (offer.offerState !== OfferState.PENDING) {
+            return c.json({
+                message: "offer is not pending",
+            }, 400);
+        }
+
         // update register in prisma
         await prisma.offer.update({
             where: {
@@ -20,6 +38,7 @@ app.patch(
             },
             data: {
                 offerState: OfferState.APPROVED,
+                approvedAt: new Date(),
             },
         });
 
@@ -35,6 +54,24 @@ app.patch(
     async c => {
         const validated = c.req.valid('json');
         const offerId = c.req.param('offerId')!;
+
+        const offer = await prisma.offer.findUnique({
+            where: {
+                id: parseInt(offerId),
+            },
+        });
+
+        if (!offer) {
+            return c.json({
+                message: "offer not found",
+            }, 404);
+        }
+
+        if (offer.offerState !== OfferState.PENDING) {
+            return c.json({
+                message: "offer is not pending",
+            }, 400);
+        }
 
         // update register in prisma
         await prisma.offer.update({

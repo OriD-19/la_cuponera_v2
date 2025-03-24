@@ -98,6 +98,7 @@ app.patch(
 
                     // reset state to pending
                     offerState: OfferState.PENDING,
+                    offerRejectedReason: null,
                 },
             });
 
