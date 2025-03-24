@@ -1,7 +1,7 @@
 import { DescribeRouteOptions } from "hono-openapi";
 import { resolver } from "hono-openapi/zod";
 import { createOfferRequestSchema, updateOfferRequestSchema } from "../schemas/offers";
-import { OfferSchema } from "../prisma/generated/zod";
+import { OfferSchema, OfferWithPartialRelationsSchema, OfferWithRelationsSchema } from "../prisma/generated/zod";
 import { z } from "zod";
 
 export const createOfferDocs: DescribeRouteOptions = {
@@ -81,7 +81,7 @@ export const getOfferDocs: DescribeRouteOptions = {
             description: "offer retrieved successfully",
             content: {
                 "application/json": {
-                    schema: resolver(OfferSchema),
+                    schema: resolver(OfferWithPartialRelationsSchema),
                 },
             },
         },

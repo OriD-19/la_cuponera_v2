@@ -207,6 +207,9 @@ app.get(
             where: {
                 id: parseInt(offerId),
             },
+            include: {
+                enterprise: true,
+            }
         });
 
         if (!offer) {

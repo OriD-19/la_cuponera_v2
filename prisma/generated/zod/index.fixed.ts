@@ -467,15 +467,15 @@ export type OfferPartialRelations = {
 export type OfferPartialWithRelations = z.infer<typeof OfferPartialSchema> & OfferPartialRelations
 
 export const OfferPartialWithRelationsSchema: z.ZodType<OfferPartialWithRelations> = OfferPartialSchema.merge(z.object({
-  enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema),
-  Coupon: z.lazy(() => CouponPartialWithRelationsSchema).array(),
+  enterprise: z.lazy(() => EnterpriseSchema),
+  Coupon: z.lazy(() => CouponSchema).array(),
 })).partial()
 
 export type OfferWithPartialRelations = z.infer<typeof OfferSchema> & OfferPartialRelations
 
 export const OfferWithPartialRelationsSchema: z.ZodType<OfferWithPartialRelations> = OfferSchema.merge(z.object({
-  enterprise: z.lazy(() => EnterprisePartialWithRelationsSchema),
-  Coupon: z.lazy(() => CouponPartialWithRelationsSchema).array(),
+  enterprise: z.lazy(() => EnterpriseSchema),
+  Coupon: z.lazy(() => CouponSchema).array(),
 }).partial())
 
 /////////////////////////////////////////
