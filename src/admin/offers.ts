@@ -1,18 +1,15 @@
 import { OfferState, PrismaClient } from '@prisma/client';
 import { Hono } from 'hono';
-import { jwt } from 'hono/jwt';
 import { validator as zValidator } from 'hono-openapi/zod';
 import { rejectOfferSchema } from '../../schemas/offers';
+import { Variables } from '../../schemas/jwtVariables';
 
 // prefix: /api/admin/v1/offers
-const app = new Hono();
+const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
 
 app.patch(
     "/:offerId/approve",
-    jwt({
-        secret: process.env.TOKEN_SECRET!,
-    }),
     async c => {
         const offerId = c.req.param('offerId');
 
@@ -34,9 +31,6 @@ app.patch(
 
 app.patch(
     "/:offerId/reject",
-    jwt({
-        secret: process.env.TOKEN_SECRET!,
-    }),
     zValidator('json', rejectOfferSchema),
     async c => {
         const validated = c.req.valid('json');
@@ -57,6 +51,19 @@ app.patch(
             message: "offer rejected",
             offerId,
         })
+    });
+
+// get all pending offers
+app.get(
+    '/pending',
+    async c => {
+        const offers = await prisma.offer.findMany({
+            where: {
+                offerState: OfferState.PENDING,
+            },
+        });
+
+        return c.json(offers);
     });
 
 export default app;
