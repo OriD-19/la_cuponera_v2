@@ -118,7 +118,6 @@ app.get(
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
-    authorization(Role.ENTERPRISE),
     async c => {
         const enterpriseId = c.get('jwtPayload').id;
 
