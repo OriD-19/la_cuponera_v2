@@ -43,6 +43,17 @@ app.get("/openapi", openAPISpecs(app, {
             description: "API for managing offers",
             version: "1.0.0",
         },
+        components: {
+            securitySchemes:
+            {
+                bearerAuth:
+                {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT",
+                },
+            },
+        },
         servers: [
             {
                 url: "http://localhost:3000",

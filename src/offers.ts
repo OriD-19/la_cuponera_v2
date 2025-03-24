@@ -8,14 +8,14 @@ import { validator as zValidator } from 'hono-openapi/zod';
 import { createOfferRequestSchema, updateOfferRequestSchema } from '../schemas/offers';
 import { CouponState, OfferState, PrismaClient } from '@prisma/client';
 import { describeRoute } from 'hono-openapi';
-import { buyCouponDocs, createOfferDocs, getOfferDocs, getOffersDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
+import { buyCouponDocs, createOfferDocs, deleteOfferDocs, getOfferDocs, getOffersDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
 
 // prefix: /api/v1/offers
 const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
 
 app.post(
-    "/create",
+    "/enterprise",
     describeRoute(createOfferDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!,
@@ -56,7 +56,7 @@ app.post(
     });
 
 app.patch(
-    '/:offerId',
+    '/enterprise/:offerId',
     describeRoute(updateOfferRequestDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!
@@ -112,6 +112,65 @@ app.patch(
         });
     });
 
+
+// list all offers, only for enterprises
+app.get(
+    "/enterprise",
+    describeRoute(getOffersDocs),
+    jwt({
+        secret: process.env.TOKEN_SECRET!,
+    }),
+    authorization(Role.ENTERPRISE),
+    async c => {
+        const enterpriseId = c.get('jwtPayload').id;
+
+        const offers = await prisma.offer.findMany({
+            where: {
+                enterpriseId: parseInt(enterpriseId),
+            },
+        });
+
+        return c.json({
+            offers: offers,
+        });
+    });
+
+app.delete(
+    '/enterprise/:offerId',
+    describeRoute(deleteOfferDocs),
+    jwt({
+        secret: process.env.TOKEN_SECRET!,
+    }),
+    authorization(Role.ENTERPRISE),
+    async c => {
+
+        const enterpriseId = c.get('jwtPayload').id;
+        const offerId = c.req.param('offerId');
+
+        const offer = await prisma.offer.findFirst({
+            where: {
+                id: parseInt(offerId),
+                enterpriseId: parseInt(enterpriseId),
+            },
+        });
+
+        if (!offer) {
+            return c.json({
+                message: "offer not found",
+            }, 404);
+        }
+
+        await prisma.offer.delete({
+            where: {
+                id: parseInt(offerId),
+            },
+        });
+
+        return c.json({
+            message: "offer deleted",
+        });
+    });
+
 // for the public URL, only list approved offers within the valid date range
 app.get(
     "/",
@@ -136,35 +195,13 @@ app.get(
     }
 );
 
-// list all offers, only for enterprises
-app.get(
-    "/enterprise",
-    describeRoute(getOffersDocs),
-    jwt({
-        secret: process.env.TOKEN_SECRET!,
-    }),
-    authorization(Role.ENTERPRISE),
-    async c => {
-        const enterpriseId = c.get('jwtPayload').id;
-
-        const offers = await prisma.offer.findMany({
-            where: {
-                enterpriseId: parseInt(enterpriseId),
-            },
-        });
-
-        return c.json({
-            offers: offers,
-        });
-    });
-
 // for all users
 app.get(
-    '/:id',
+    '/:offerId',
     describeRoute(getOfferDocs),
     async c => {
 
-        const offerId = c.req.param('id');
+        const offerId = c.req.param('offerId');
 
         const offer = await prisma.offer.findFirst({
             where: {
