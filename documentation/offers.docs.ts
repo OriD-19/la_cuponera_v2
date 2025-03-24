@@ -4,6 +4,8 @@ import { createOfferRequestSchema, updateOfferRequestSchema } from "../schemas/o
 import { OfferSchema, OfferWithPartialRelationsSchema, OfferWithRelationsSchema } from "../prisma/generated/zod";
 import { z } from "zod";
 
+import "zod-openapi/extend";
+
 export const createOfferDocs: DescribeRouteOptions = {
     description: "Create a new offer",
     requestParams: {
@@ -57,14 +59,65 @@ export const createOfferDocs: DescribeRouteOptions = {
     }
 };
 
-export const getOffersDocs: DescribeRouteOptions = {
-    description: "Get all offers (general purpose, suited for client-type users). Shows only approved offers within the valid date range.",
+const getOffersResponseSchema = z.object({
+    offers: z.array(OfferSchema),
+    next: z.string().openapi({ example: "http://localhost:3000/api/v1/offers?offset=10&limit=10" }),
+});
+
+export const getOffersEnterpriseDocs: DescribeRouteOptions = {
+    description: "Get all offers from an enterprise (enterprise users only)",
+    parameters: [
+        {
+            name: "offset",
+            in: "query",
+            required: false,
+            description: "pagination offset",
+            schema: { type: "string" },
+        },
+        {
+            name: "limit",
+            in: "query",
+            required: false,
+            description: "pagination limit",
+            schema: { type: "string" },
+        },
+    ],
     responses: {
         200: {
             description: "offers retrieved successfully",
             content: {
                 "application/json": {
-                    schema: resolver(z.array(OfferSchema)),
+                    schema: resolver(getOffersResponseSchema),
+                },
+            },
+        },
+    },
+};
+
+export const getOffersDocs: DescribeRouteOptions = {
+    description: "Get all offers (general purpose, suited for client-type users). Shows only approved offers within the valid date range.",
+    parameters: [
+        {
+            name: "offset",
+            in: "query",
+            required: false,
+            description: "pagination offset",
+            schema: { type: "string" },
+        },
+        {
+            name: "limit",
+            in: "query",
+            required: false,
+            description: "pagination limit",
+            schema: { type: "string" },
+        },
+    ],
+    responses: {
+        200: {
+            description: "offers retrieved successfully",
+            content: {
+                "application/json": {
+                    schema: resolver(getOffersResponseSchema),
                 },
             },
         },

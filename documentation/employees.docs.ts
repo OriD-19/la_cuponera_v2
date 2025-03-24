@@ -2,6 +2,7 @@ import { DescribeRouteOptions } from "hono-openapi";
 import { updateEmployeeRequestSchema } from "../schemas/employees";
 import { resolver } from "hono-openapi/zod";
 import { z } from 'zod';
+import { EmployeeSchema } from "../prisma/generated/zod";
 
 export const updateEmployeeDocs: DescribeRouteOptions = {
     description: "Update an employee",
@@ -119,6 +120,23 @@ export const deleteEmployeeDocs: DescribeRouteOptions = {
                             },
                         },
                     },
+                },
+            },
+        },
+    },
+};
+
+export const getEmployeesDocs: DescribeRouteOptions = {
+    description: "Get all employees",
+    requestParams: {
+        header: z.object({ 'Authorization': z.string() }),
+    },
+    responses: {
+        200: {
+            description: "employees retrieved successfully",
+            content: {
+                "application/json": {
+                    schema: resolver(z.array(EmployeeSchema)),
                 },
             },
         },

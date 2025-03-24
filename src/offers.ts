@@ -8,7 +8,7 @@ import { validator as zValidator } from 'hono-openapi/zod';
 import { createOfferRequestSchema, updateOfferRequestSchema } from '../schemas/offers';
 import { CouponState, OfferState, PrismaClient } from '@prisma/client';
 import { describeRoute } from 'hono-openapi';
-import { buyCouponDocs, createOfferDocs, deleteOfferDocs, getOfferDocs, getOffersDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
+import { buyCouponDocs, createOfferDocs, deleteOfferDocs, getOfferDocs, getOffersDocs, getOffersEnterpriseDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
 
 // prefix: /api/v1/offers
 const app = new Hono<{ Variables: Variables }>();
@@ -117,7 +117,7 @@ app.patch(
 // list all offers, only for enterprises
 app.get(
     "/enterprise",
-    describeRoute(getOffersDocs),
+    describeRoute(getOffersEnterpriseDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
@@ -125,14 +125,24 @@ app.get(
     async c => {
         const enterpriseId = c.get('jwtPayload').id;
 
+        //add pagination
+        const offset = c.req.query("offset") ?? "0";
+        const limit = c.req.query("limit") ?? "10";
+
         const offers = await prisma.offer.findMany({
+            skip: parseInt(offset),
+            take: parseInt(limit),
             where: {
                 enterpriseId: parseInt(enterpriseId),
             },
         });
 
+        const basePath = c.req.url.split("?")[0];
+        console.log(basePath);
+
         return c.json({
             offers: offers,
+            next: `${basePath}?offset=${parseInt(offset) + parseInt(limit)}&limit=${limit}`,
         });
     });
 
@@ -178,7 +188,12 @@ app.get(
     describeRoute(getOffersDocs),
     async c => {
 
+        const offset = c.req.query("offset") ?? "0";
+        const limit = c.req.query("limit") ?? "10";
+
         const offers = await prisma.offer.findMany({
+            skip: parseInt(offset),
+            take: parseInt(limit),
             where: {
                 offerState: OfferState.ACTIVE,
                 validFrom: {
@@ -190,8 +205,11 @@ app.get(
             }
         });
 
+        const basePath = c.req.url.split("?")[0];
+
         return c.json({
             offers: offers,
+            next: `${basePath}?offset=${parseInt(offset) + parseInt(limit)}&limit=${limit}`,
         });
     }
 );
