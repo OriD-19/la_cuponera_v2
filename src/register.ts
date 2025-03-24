@@ -1,23 +1,27 @@
 import { Hono } from 'hono';
 import { jwt } from 'hono/jwt';
 import { Variables } from '../schemas/jwtVariables';
-import { zValidator } from '@hono/zod-validator';
+import { validator as zValidator } from 'hono-openapi/zod';
 import { registerClientRequestSchema, registerEmployeeRequestSchema, registerEnterpriseRequestSchema } from '../schemas/register';
 
 import { Prisma, PrismaClient } from '@prisma/client';
 import { authorization, Role } from '../middleware/authorization';
 
 import { hash } from 'bcrypt';
+import { describeRoute } from 'hono-openapi';
+import { registerClientDocs, registerEmployeeDocs, registerEnterpriseDocs } from '../documentation/register.docs';
 
 const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
 
-app.post("/client",
+app.post(
+    "/client",
+    describeRoute(registerClientDocs),
     zValidator('json', registerClientRequestSchema),
     async c => {
 
         const validated = c.req.valid('json');
-        const passwordHash = await hash(validated.password, 10);
+        const passwordHash = await hash(validated.password, 12);
 
         try {
             await prisma.client.create({
@@ -52,7 +56,9 @@ app.post("/client",
     });
 
 // admin only
-app.post("/enterprise",
+app.post(
+    "/enterprise",
+    describeRoute(registerEnterpriseDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
@@ -63,7 +69,7 @@ app.post("/enterprise",
         const validated = c.req.valid('json');
 
         const enterpriseCode = validated.firstName
-        const passwordHash = await hash(validated.password, 10);
+        const passwordHash = await hash(validated.password, 12);
 
         try {
             await prisma.enterprise.create({
@@ -100,7 +106,9 @@ app.post("/enterprise",
     });
 
 // enterprise admin only
-app.post('/employee',
+app.post(
+    '/employee',
+    describeRoute(registerEmployeeDocs),
     jwt({
         secret: process.env.TOKEN_SECRET!
     }),
@@ -109,7 +117,7 @@ app.post('/employee',
     async c => {
 
         const validated = c.req.valid('json');
-        const passwordHash = await hash(validated.password, 10);
+        const passwordHash = await hash(validated.password, 12);
 
         try {
             await prisma.employee.create({

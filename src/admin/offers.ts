@@ -1,20 +1,35 @@
 import { OfferState, PrismaClient } from '@prisma/client';
 import { Hono } from 'hono';
-import { jwt } from 'hono/jwt';
 import { validator as zValidator } from 'hono-openapi/zod';
 import { rejectOfferSchema } from '../../schemas/offers';
+import { Variables } from '../../schemas/jwtVariables';
 
 // prefix: /api/admin/v1/offers
-const app = new Hono();
+const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
 
 app.patch(
     "/:offerId/approve",
-    jwt({
-        secret: process.env.TOKEN_SECRET!,
-    }),
     async c => {
         const offerId = c.req.param('offerId');
+
+        const offer = await prisma.offer.findUnique({
+            where: {
+                id: parseInt(offerId),
+            },
+        });
+
+        if (!offer) {
+            return c.json({
+                message: "offer not found",
+            }, 404);
+        }
+
+        if (offer.offerState !== OfferState.PENDING) {
+            return c.json({
+                message: "offer is not pending",
+            }, 400);
+        }
 
         // update register in prisma
         await prisma.offer.update({
@@ -23,6 +38,7 @@ app.patch(
             },
             data: {
                 offerState: OfferState.APPROVED,
+                approvedAt: new Date(),
             },
         });
 
@@ -34,13 +50,28 @@ app.patch(
 
 app.patch(
     "/:offerId/reject",
-    jwt({
-        secret: process.env.TOKEN_SECRET!,
-    }),
     zValidator('json', rejectOfferSchema),
     async c => {
         const validated = c.req.valid('json');
         const offerId = c.req.param('offerId')!;
+
+        const offer = await prisma.offer.findUnique({
+            where: {
+                id: parseInt(offerId),
+            },
+        });
+
+        if (!offer) {
+            return c.json({
+                message: "offer not found",
+            }, 404);
+        }
+
+        if (offer.offerState !== OfferState.PENDING) {
+            return c.json({
+                message: "offer is not pending",
+            }, 400);
+        }
 
         // update register in prisma
         await prisma.offer.update({
@@ -57,6 +88,19 @@ app.patch(
             message: "offer rejected",
             offerId,
         })
+    });
+
+// get all pending offers
+app.get(
+    '/pending',
+    async c => {
+        const offers = await prisma.offer.findMany({
+            where: {
+                offerState: OfferState.PENDING,
+            },
+        });
+
+        return c.json(offers);
     });
 
 export default app;
