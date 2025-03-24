@@ -5,7 +5,7 @@ import { Variables } from '../schemas/jwtVariables';
 import "dotenv/config";
 import { authorization, Role } from '../middleware/authorization';
 import { validator as zValidator } from 'hono-openapi/zod';
-import { createOfferRequestSchema, getOffersResponseSchema, updateOfferRequestSchema } from '../schemas/offers';
+import { createOfferRequestSchema, updateOfferRequestSchema } from '../schemas/offers';
 import { CouponState, OfferState, PrismaClient } from '@prisma/client';
 import { describeRoute } from 'hono-openapi';
 import { buyCouponDocs, createOfferDocs, getOfferDocs, getOffersDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
@@ -112,12 +112,23 @@ app.patch(
         });
     });
 
+// for the public URL, only list approved offers within the valid date range
 app.get(
     "/",
     describeRoute(getOffersDocs),
     async c => {
 
-        const offers = await prisma.offer.findMany();
+        const offers = await prisma.offer.findMany({
+            where: {
+                offerState: OfferState.ACTIVE,
+                validFrom: {
+                    lte: new Date(),
+                },
+                validUntil: {
+                    gte: new Date(),
+                },
+            }
+        });
 
         return c.json({
             offers: offers,
@@ -125,6 +136,7 @@ app.get(
     }
 );
 
+// list all offers, only for enterprises
 app.get(
     "/enterprise",
     describeRoute(getOffersDocs),

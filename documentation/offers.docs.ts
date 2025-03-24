@@ -53,7 +53,7 @@ export const createOfferDocs: DescribeRouteOptions = {
 };
 
 export const getOffersDocs: DescribeRouteOptions = {
-    description: "Get all offers",
+    description: "Get all offers (general purpose, suited for client-type users). Shows only approved offers within the valid date range.",
     responses: {
         200: {
             description: "offers retrieved successfully",
