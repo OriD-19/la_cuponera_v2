@@ -70,6 +70,10 @@ app.get("/openapi", openAPISpecs(app, {
                 url: "http://localhost:3000",
                 description: "Local server",
             },
+            {
+                url: "https://apiv1.lacuponera.store",
+                description: "Production server",
+            }
         ],
     },
 }));
