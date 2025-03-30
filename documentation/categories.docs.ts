@@ -110,3 +110,39 @@ export const updateCategoryDocs: DescribeRouteOptions = {
         }
     },
 };
+
+export const deleteCategoryDocs: DescribeRouteOptions = {
+    description: "Delete a category",
+    responses: {
+        200: {
+            description: "category deleted successfully",
+            content: {
+                "application/json": {
+                    schema: z.object({
+                        message: z.string(),
+                    }),
+                },
+            },
+        },
+        404: {
+            description: "category not found",
+            content: {
+                "application/json": {
+                    schema: z.object({
+                        message: z.string(),
+                    }),
+                },
+            },
+        },
+        403: {
+            description: "you do not have permissions to delete this category",
+            content: {
+                "application/json": {
+                    schema: z.object({
+                        message: z.string(),
+                    }),
+                },
+            },
+        }
+    },
+};

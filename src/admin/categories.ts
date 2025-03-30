@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { validator as zValidator } from "hono-openapi/zod";
 import { createCategorySchema, updateCategorySchema } from "../../schemas/categories";
 import { describeRoute } from "hono-openapi";
-import { createCategoryDocs, updateCategoryDocs } from "../../documentation/categories.docs";
+import { createCategoryDocs, deleteCategoryDocs, updateCategoryDocs } from "../../documentation/categories.docs";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 // prefix: /api/v1/admin/categories
@@ -61,5 +61,35 @@ app.patch(
         }
     }
 );
+
+app.delete(
+    "/categories/:categoryId",
+    describeRoute(deleteCategoryDocs),
+    async c => {
+        const categoryId = c.req.param('categoryId');
+
+        const category = await prisma.category.findUnique({
+            where: {
+                id: parseInt(categoryId),
+            },
+        });
+
+        if (!category) {
+            return c.json({
+                message: "category not found",
+            }, 404);
+        }
+
+        await prisma.category.delete({
+            where: {
+                id: parseInt(categoryId),
+            },
+        });
+
+        return c.json({
+            message: "category deleted successfully",
+        });
+    }
+)
 
 export default app;
