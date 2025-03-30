@@ -37,7 +37,11 @@ app.post(
                     validFrom: validated.validFrom,
                     validUntil: validated.validUntil,
                     quantityLimit: validated.quantityLimit,
-                    enterpriseId: parseInt(enterpriseId),
+                    enterprise: {
+                        connect: {
+                            id: parseInt(enterpriseId),
+                        },
+                    },
 
                     // pending state by default
                     offerState: OfferState.PENDING,
@@ -45,6 +49,7 @@ app.post(
             });
 
         } catch (err) {
+            console.error(err);
             return c.json({
                 message: "could not create offer with provided information",
             }, 400);

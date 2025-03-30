@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { logger } from 'hono/logger';
 import login from './login';
 import offers from './offers';
 import adminOffers from './admin/offers';
@@ -23,6 +24,7 @@ const adminApp = new Hono().basePath('/admin')
 adminApp.use("/*", jwt({ secret: process.env.TOKEN_SECRET! }), authorization(Role.ADMIN));
 
 const app = new Hono<{ Variables: Variables }>().basePath("/api/v1");
+app.use(logger());
 
 app.route("/login", login);
 app.route("/offers", offers);

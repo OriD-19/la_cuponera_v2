@@ -102,8 +102,8 @@ export const createOfferRequestSchema = z.object({
     description: z.string().openapi({ description: "A detailed description of the offer", example: "Get 50% off on all electronic items this weekend." }),
     originalPrice: z.number().openapi({ description: "The original price of the product or service", example: 100 }),
     discountPrice: z.number().openapi({ description: "The discounted price of the product or service", example: 50 }),
-    validFrom: z.string().date().openapi({ description: "The start date from which the offer is valid", example: "2023-01-01T00:00:00.000Z" }),
-    validUntil: z.string().date().openapi({ description: "The end date until which the offer is valid", example: "2023-01-07T23:59:59.999Z" }),
+    validFrom: z.string().datetime().openapi({ description: "The start date from which the offer is valid", example: "2023-01-01T00:00:00.000Z" }),
+    validUntil: z.string().datetime().openapi({ description: "The end date until which the offer is valid", example: "2023-01-07T23:59:59.999Z" }),
     quantityLimit: z.number().optional().openapi({ description: "The maximum quantity available for the offer (optional)", example: 100 }),
     categoryId: z.number().openapi({ description: "The ID of the category to which the offer belongs", example: 1 }),
 });
@@ -114,8 +114,8 @@ export const updateOfferRequestSchema = z.object({
     description: z.string().optional().openapi({ description: "A detailed description of the offer (optional)", example: "Get 50% off on all electronic items this weekend." }),
     originalPrice: z.number().optional().openapi({ description: "The original price of the product or service (optional)", example: 100 }),
     discountPrice: z.number().optional().openapi({ description: "The discounted price of the product or service (optional)", example: 50 }),
-    validFrom: z.string().date().optional().openapi({ description: "The start date from which the offer is valid (optional)", example: "2023-01-01T00:00:00.000Z" }),
-    validUntil: z.string().date().optional().openapi({ description: "The end date until which the offer is valid (optional)", example: "2023-01-07T23:59:59.999Z" }),
+    validFrom: z.string().datetime().optional().openapi({ description: "The start date from which the offer is valid (optional)", example: "2023-01-01T00:00:00.000Z" }),
+    validUntil: z.string().datetime().optional().openapi({ description: "The end date until which the offer is valid (optional)", example: "2023-01-07T23:59:59.999Z" }),
     quantityLimit: z.number().optional().openapi({ description: "The maximum quantity available for the offer (optional)", example: 100 }),
     categoryId: z.number().optional().openapi({ description: "The ID of the category to which the offer belongs (optional)", example: 1 }),
 }).openapi({ description: "Schema for updating an offer" });
