@@ -40,8 +40,8 @@ export const getClientsResponseSchema = z.object({
             firstName: z.string(),
             lastName: z.string(),
             phone: z.string(),
-            createdAt: z.date(),
-            updatedAt: z.date(),
+            createdAt: z.string().date(),
+            updatedAt: z.string().date(),
         })
     ),
 });

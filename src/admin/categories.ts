@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { validator as zValidator } from "hono-openapi/zod";
-import { createCategorySchema } from "../../schemas/categories";
+import { createCategorySchema, updateCategorySchema } from "../../schemas/categories";
 import { describeRoute } from "hono-openapi";
-import { createCategoryDocs } from "../../documentation/categories.docs";
+import { createCategoryDocs, updateCategoryDocs } from "../../documentation/categories.docs";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 // prefix: /api/v1/admin/categories
@@ -37,13 +37,29 @@ app.post(
 
         return c.json({
             message: "category created successfully",
-        })
+        });
     }
 );
 
 app.patch(
-    "/categories",
+    "/categories/:categoryId",
+    describeRoute(updateCategoryDocs),
+    zValidator('json', updateCategorySchema),
     async c => {
+        const categoryId = c.req.param('categoryId');
 
+        const category = await prisma.category.findUnique({
+            where: {
+                id: parseInt(categoryId),
+            },
+        });
+
+        if (!category) {
+            return c.json({
+                message: "category not found",
+            }, 404);
+        }
     }
 );
+
+export default app;

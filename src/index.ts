@@ -7,6 +7,8 @@ import employees from './employees';
 import adminClients from './admin/clients';
 import adminEnterprises from './admin/enterprises';
 import coupons from "./coupons";
+import adminCategories from './admin/categories';
+import categories from './categories';
 import { Variables } from '../schemas/jwtVariables';
 import { apiReference } from "@scalar/hono-api-reference";
 import { openAPISpecs } from 'hono-openapi';
@@ -26,6 +28,7 @@ app.route("/login", login);
 app.route("/offers", offers);
 app.route("/register", register);
 app.route("/coupons", coupons);
+app.route('/categories', categories);
 
 // protect the route of employees only for an enterprise
 app.use('/employees',  authorization(Role.EMPLOYEE));
@@ -34,6 +37,7 @@ app.route('/employees', employees);
 adminApp.route("/offers", adminOffers);
 adminApp.route("/clients", adminClients);
 adminApp.route("/enterprises", adminEnterprises);
+adminApp.route("/categories", adminCategories);
 
 app.route('/', adminApp);
 
