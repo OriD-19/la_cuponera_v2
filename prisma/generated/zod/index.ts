@@ -49,11 +49,11 @@ export type CouponStateType = `${z.infer<typeof CouponStateSchema>}`
 /////////////////////////////////////////
 
 export const CategorySchema = z.object({
-  id: z.number().int(),
-  name: z.string(),
-  description: z.string().nullable(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  id: z.number().int().openapi({ description: "The ID of the category", example: 1 }),
+  name: z.string().openapi({ description: "The name of the category", example: "Category Name" }),
+  description: z.string().nullable().openapi({ description: "The description of the category", example: "Category Description" }),
+  createdAt: z.coerce.date().openapi({ description: "The date when the category was created", example: "2021-10-01T00:00:00.000Z" }),
+  updatedAt: z.coerce.date().openapi({ description: "The date when the category was last updated", example: "2021-10-01T00:00:00.000Z" }),
 })
 
 export type Category = z.infer<typeof CategorySchema>
