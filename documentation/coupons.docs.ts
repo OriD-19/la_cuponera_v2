@@ -2,6 +2,7 @@ import { DescribeRouteOptions } from "hono-openapi";
 import { resolver } from "hono-openapi/zod";
 import { z } from 'zod';
 import { CouponWithRelationsSchema } from "../prisma/generated/zod";
+import { redeemCouponRequestSchema } from "../schemas/coupons";
 
 export const getCouponsDocs: DescribeRouteOptions = {
     description: "Get all coupons available in the system",
@@ -43,6 +44,13 @@ export const redeemCouponDocs: DescribeRouteOptions = {
     requestParams: {
         header: z.object({ 'Authorization': z.string() }),
         param: z.object({ couponId: z.string() })
+    },
+    requestBody: {
+        content: {
+            "application/json": {
+                schema: resolver(redeemCouponRequestSchema),
+            },
+        },
     },
     responses: {
         200: {

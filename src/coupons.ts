@@ -6,6 +6,9 @@ import { Variables } from 'hono/types';
 import { describeRoute } from 'hono-openapi';
 import { getCouponDocs, getCouponsDocs, redeemCouponDocs } from '../documentation/coupons.docs';
 import { authorization, Role } from '../middleware/authorization';
+import { validator as zValidator } from 'hono-openapi/zod';
+import { z } from 'zod';
+import { redeemCouponRequestSchema } from '../schemas/coupons';
 
 // prefix: /api/v1/coupons
 const app = new Hono<{ Variables: Variables }>();
@@ -86,10 +89,11 @@ app.post(
         secret: process.env.TOKEN_SECRET!,
     }),
     authorization(Role.EMPLOYEE),
+    zValidator('json', redeemCouponRequestSchema),
     async c => {
         const couponCode = c.req.param('couponCode');
-
         const employeeId = parseInt(c.get('jwtPayload').id);
+        const validated = c.req.valid('json');
 
         const employee = await prisma.employee.findFirst({
             where: {
@@ -108,7 +112,8 @@ app.post(
                 code: couponCode,
             },
             include: {
-               offerDetails: true, 
+                client: true,
+                offerDetails: true,
             }
         });
 
@@ -124,9 +129,21 @@ app.post(
             }, 403);
         }
 
+        if (coupon.couponState !== 'VALID') {
+            return c.json({
+                message: "invalid coupon state",
+            }, 400);
+        }
+
+        if (coupon.client.DUI !== validated.DUI) {
+            return c.json({
+                message: "client information does not match",
+            }, 400);
+        }
+
         await prisma.coupon.update({
             where: {
-                id: parseInt(couponCode),
+                code: couponCode,
             },
             data: {
                 couponState: 'USED',

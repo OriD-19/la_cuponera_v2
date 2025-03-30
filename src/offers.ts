@@ -375,6 +375,12 @@ app.post(
             }
         }
 
+        if (offer.offerState !== OfferState.ACTIVE) {
+            return c.json({
+                message: "offer not available",
+            }, 400);
+        }
+
         // generate a random 7-digit number
         const randNum = Math.floor(1000000 + Math.random() * 9000000);
 

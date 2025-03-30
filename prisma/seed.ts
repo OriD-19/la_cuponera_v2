@@ -53,6 +53,25 @@ async function main() {
         }
     });
 
+    await prisma.employee.create({
+        data: {
+            user: {
+                create: {
+                    firstName: faker.person.firstName(),
+                    lastName: faker.person.lastName(),
+                    email: "employee@employee.com",
+                    password: "$2a$12$AwhGLAMrS3qXtufrTVt4SOOIRd1/X.PaUaytjHtjGUl2RrdPMcqDO", // micontrasenia
+                }
+            },
+            phone: faker.phone.number(),
+            enterprise: {
+                connect: {
+                    id: 1,
+                }
+            }
+        }
+    })
+
     const offerStates: OfferState[] = ["PENDING", "ACTIVE", "EXPIRED", "REJECTED", "DISCARDED"];
 
 

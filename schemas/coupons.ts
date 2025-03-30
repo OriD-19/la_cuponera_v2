@@ -45,3 +45,7 @@ export const getCouponsResponseSchema = z.object({
         })
     ),
 });
+
+export const redeemCouponRequestSchema = z.object({
+    DUI: z.string().openapi({ description: "DUI of the user redeeming the coupon", example: "123456789" }),
+})
