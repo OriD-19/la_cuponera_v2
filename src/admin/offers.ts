@@ -3,6 +3,8 @@ import { Hono } from 'hono';
 import { validator as zValidator } from 'hono-openapi/zod';
 import { rejectOfferSchema } from '../../schemas/offers';
 import { Variables } from '../../schemas/jwtVariables';
+import { describeRoute } from 'hono-openapi';
+import { approveOfferAdminDocs, getAllOffersForAdminDocs, getAllPendingOffersForAdminDocs, rejectOfferAdminDocs } from '../../documentation/offers.docs';
 
 // prefix: /api/admin/v1/offers
 const app = new Hono<{ Variables: Variables }>();
@@ -10,6 +12,7 @@ const prisma = new PrismaClient();
 
 app.patch(
     "/:offerId/approve",
+    describeRoute(approveOfferAdminDocs),
     async c => {
         const offerId = c.req.param('offerId');
 
@@ -50,6 +53,7 @@ app.patch(
 
 app.patch(
     "/:offerId/reject",
+    describeRoute(rejectOfferAdminDocs),
     zValidator('json', rejectOfferSchema),
     async c => {
         const validated = c.req.valid('json');
@@ -93,6 +97,7 @@ app.patch(
 // get all pending offers
 app.get(
     '/pending',
+    describeRoute(getAllPendingOffersForAdminDocs),
     async c => {
         const offers = await prisma.offer.findMany({
             where: {
@@ -105,6 +110,7 @@ app.get(
 
 app.get(
     '/',
+    describeRoute(getAllOffersForAdminDocs),
     async c => {
 
         const offset = c.req.query("offset") ?? "0";
@@ -139,6 +145,7 @@ app.get(
 
 app.get(
     '/categories/:categoryId',
+    describeRoute(getAllOffersForAdminDocs),
     async c => {
         const categoryId = c.req.param('categoryId');
 

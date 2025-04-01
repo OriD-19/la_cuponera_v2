@@ -307,3 +307,167 @@ export const deleteOfferDocs: DescribeRouteOptions = {
         },
     },
 };
+
+export const getAllOffersForAdminDocs: DescribeRouteOptions = {
+    description: "Get all offers for admin",
+    requestParams: {
+        header: z.object({ 'Authorization': z.string() }),
+    },
+    security: [
+        {
+            bearerAuth: [],
+        }
+    ],
+    parameters: [
+        {
+            name: "offset",
+            in: "query",
+            required: false,
+            description: "pagination offset",
+            schema: { type: "string" },
+        },
+        {
+            name: "limit",
+            in: "query",
+            required: false,
+            description: "pagination limit",
+            schema: { type: "string" },
+        },
+    ],
+    responses: {
+        200: {
+            description: "offers retrieved successfully",
+            content: {
+                "application/json": {
+                    schema: resolver(getOffersResponseSchema),
+                },
+            },
+        },
+    },
+};
+
+
+export const getAllPendingOffersForAdminDocs: DescribeRouteOptions = {
+    description: "Get all pending offers for admin",
+    requestParams: {
+        header: z.object({ 'Authorization': z.string() }),
+    },
+    security: [
+        {
+            bearerAuth: [],
+        }
+    ],
+    responses: {
+        200: {
+            description: "offers retrieved successfully",
+            content: {
+                "application/json": {
+                    schema: resolver(getOffersResponseSchema),
+                },
+            },
+        },
+    },
+};
+
+export const rejectOfferAdminDocs: DescribeRouteOptions = {
+    description: "Reject an offer for admin",
+    requestParams: {
+        header: z.object({ 'Authorization': z.string() }),
+        route: z.object({ offerId: z.string() }),
+    },
+    security: [
+        {
+            bearerAuth: [],
+        }
+    ],
+    requestBody: {
+        content: {
+            "application/json": {
+                schema: z.object({
+                    reason: z.string().openapi({ description: "The reason to why the offer was rejected", example: "The offer does not meet the requirements" }),
+                }),
+            },
+        },
+    },
+    responses: {
+        200: {
+            description: "offer rejected successfully",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "offer with id 1 rejected successfully",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        404: {
+            description: "offer not found",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "offer not found",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+};
+
+export const approveOfferAdminDocs: DescribeRouteOptions = {
+    description: "Approve an offer for admin",
+    requestParams: {
+        header: z.object({ 'Authorization': z.string() }),
+        route: z.object({ offerId: z.string() }),
+    },
+    security: [
+        {
+            bearerAuth: [],
+        }
+    ],
+    responses: {
+        200: {
+            description: "offer approved successfully",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "offer with id 1 approved successfully",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        404: {
+            description: "offer not found",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "offer not found",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+};
