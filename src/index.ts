@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { logger } from 'hono/logger';
+import { cors } from 'hono/cors';
 import login from './login';
 import offers from './offers';
 import adminOffers from './admin/offers';
@@ -20,11 +21,15 @@ import { jwt } from 'hono/jwt';
 
 // for administrator only
 const adminApp = new Hono().basePath('/admin')
+adminApp.use(logger());
+adminApp.use(cors());
+
 // authorization middleware for the administrator api
 adminApp.use("/*", jwt({ secret: process.env.TOKEN_SECRET! }), authorization(Role.ADMIN));
 
 const app = new Hono<{ Variables: Variables }>().basePath("/api/v1");
 app.use(logger());
+app.use(cors());
 
 app.route("/login", login);
 app.route("/offers", offers);
