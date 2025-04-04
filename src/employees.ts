@@ -92,6 +92,9 @@ app.patch(
             where: {
                 id: parseInt(employeeId),
             },
+            include: {
+                user: true,
+            }
         });
 
         if (!employee) {
@@ -110,6 +113,8 @@ app.patch(
             validated.password = await hash(validated.password, 10);
         }
 
+        console.log("validated", validated);    
+
         await prisma.employee.update({
             where: {
                 id: parseInt(employeeId),
@@ -118,7 +123,7 @@ app.patch(
                 user: {
                     update: {
                         email: validated.email,
-                        password: validated.password,
+                        password: validated.password ? validated.password : employee.user.password,
                         firstName: validated.firstName,
                         lastName: validated.lastName,
                     }
