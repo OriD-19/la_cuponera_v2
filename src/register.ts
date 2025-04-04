@@ -71,7 +71,7 @@ app.post(
         const passwordHash = await hash(validated.password, 12);
 
         try {
-            await prisma.enterprise.create({
+            const userId = await prisma.enterprise.create({
                 data: {
                     user: {
                         create: {
@@ -93,8 +93,26 @@ app.post(
                 }
             });
 
+            const sendNewEnterprise = await prisma.enterprise.findUnique({
+                where: {
+                    id: userId.id,
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            email: true,
+                        }
+                    },
+                    Category: true,
+                }
+            });
+
+
             return c.json({
                 message: "enterprise created successfully",
+                user: sendNewEnterprise,
             }, 201);
         } catch (e: any) {
 
