@@ -115,8 +115,16 @@ app.patch(
                 id: parseInt(employeeId),
             },
             data: {
-                ...validated,
-            },
+                user: {
+                    update: {
+                        email: validated.email,
+                        password: validated.password,
+                        firstName: validated.firstName,
+                        lastName: validated.lastName,
+                    }
+                },
+                phone: validated.phone,
+            }
         });
 
         return c.json({
