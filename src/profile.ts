@@ -46,6 +46,7 @@ app.get('/',
                     password: undefined,
                     ...client,
                     userId: undefined,
+                    role: userRole,
                 })
             }
 
@@ -58,6 +59,7 @@ app.get('/',
                     password: undefined,
                     ...employee,
                     userId: undefined,
+                    role: userRole,
                 })
             }
 
@@ -70,6 +72,7 @@ app.get('/',
                     password: undefined,
                     ...enterprise,
                     userId: undefined,
+                    role: userRole,
                 })
             }
 
@@ -82,6 +85,7 @@ app.get('/',
                     password: undefined,
                     ...admin,
                     userId: undefined,
+                    role: userRole,
                 })
             }
 

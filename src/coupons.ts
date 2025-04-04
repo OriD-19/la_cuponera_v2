@@ -24,7 +24,7 @@ app.get(
     authorization(Role.CLIENT),
     async c => {
 
-        const clientId = parseInt(c.get('jwtPayload').id);
+        const clientId = parseInt(c.get('jwtPayload').clientId!);
         const coupons = await prisma.coupon.findMany({
             where: {
                 clientId: clientId,
@@ -54,7 +54,7 @@ app.get(
     authorization(Role.CLIENT),
     async c => {
 
-        const clientId = parseInt(c.get('jwtPayload').id);
+        const clientId = parseInt(c.get('jwtPayload').clientId!);
         const couponCode = c.req.param('couponCode');
 
         const coupon = await prisma.coupon.findUnique({
@@ -92,7 +92,7 @@ app.post(
     zValidator('json', redeemCouponRequestSchema),
     async c => {
         const couponCode = c.req.param('couponCode');
-        const employeeId = parseInt(c.get('jwtPayload').id);
+        const employeeId = parseInt(c.get('jwtPayload').employeeId!);
         const validated = c.req.valid('json');
 
         const employee = await prisma.employee.findFirst({

@@ -142,3 +142,54 @@ export const getEmployeesDocs: DescribeRouteOptions = {
         },
     },
 };
+
+export const getAllEmployeesDocs: DescribeRouteOptions = {
+    description: "Get all employees",
+    requestParams: {
+        header: z.object({ 'Authorization': z.string() }),
+    },
+    responses: {
+        200: {
+            description: "employees retrieved successfully",
+            content: {
+                "application/json": {
+                    schema: resolver(z.array(EmployeeSchema)),
+                },
+            },
+        },
+    },
+};
+
+export const getEmployeeDocs: DescribeRouteOptions = {
+    description: "Get an employee",
+    requestParams: {
+        header: z.object({ 'Authorization': z.string() }),
+        route: z.object({ employeeId: z.string() }),
+    },
+    responses: {
+        200: {
+            description: "employee retrieved successfully",
+            content: {
+                "application/json": {
+                    schema: resolver(EmployeeSchema),
+                },
+            },
+        },
+        404: {
+            description: "employee not found",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "employee not found",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+};

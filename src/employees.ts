@@ -4,14 +4,69 @@ import 'dotenv/config';
 import { jwt } from 'hono/jwt';
 import { describeRoute } from 'hono-openapi';
 import { Variables } from '../schemas/jwtVariables';
-import { deleteEmployeeDocs, updateEmployeeDocs } from '../documentation/employees.docs';
+import { deleteEmployeeDocs, getAllEmployeesDocs, getEmployeeDocs, updateEmployeeDocs } from '../documentation/employees.docs';
 import { validator as zValidator } from "hono-openapi/zod";
 import { updateEmployeeRequestSchema } from '../schemas/employees';
 import { hash } from 'bcrypt';
+import { authorization, Role } from '../middleware/authorization';
 
 // prefix: /api/v1/employees
 const app = new Hono<{ Variables: Variables }>();
 const prisma = new PrismaClient();
+
+app.get(
+    '/',
+    describeRoute(getAllEmployeesDocs),
+    jwt({
+        secret: process.env.TOKEN_SECRET!,
+    }),
+    authorization(Role.ENTERPRISE),
+    async c => {
+        const enterpriseId = parseInt(c.get('jwtPayload').enterpriseId!);
+
+        const employees = await prisma.employee.findMany({
+            where: {
+                enterpriseId: enterpriseId,
+            },
+            orderBy: {
+                id: 'asc',
+            },
+        });
+
+        return c.json(employees);
+    });
+
+app.get(
+    '/:employeeId',
+    describeRoute(getEmployeeDocs),
+    jwt({
+        secret: process.env.TOKEN_SECRET!,
+    }),
+    authorization(Role.ENTERPRISE),
+    async c => {
+        const enterpriseId = parseInt(c.get('jwtPayload').enterpriseId!);
+        const employeeId = c.req.param('employeeId');
+
+        const employee = await prisma.employee.findUnique({
+            where: {
+                id: parseInt(employeeId),
+            },
+        });
+
+        if (!employee) {
+            return c.json({
+                message: "employee not found",
+            }, 404);
+        }
+
+        if (employee.enterpriseId !== enterpriseId) {
+            return c.json({
+                message: "cannot get employee from another enterprise",
+            }, 403);
+        }
+
+        return c.json(employee);
+    });
 
 app.patch(
     '/:employeeId',
@@ -20,11 +75,12 @@ app.patch(
         secret: process.env.TOKEN_SECRET!,
     }),
     zValidator('json', updateEmployeeRequestSchema),
+    authorization(Role.ENTERPRISE),
     async c => {
 
         const validated = c.req.valid('json');
 
-        const enterpriseId = parseInt(c.get('jwtPayload').id);
+        const enterpriseId = parseInt(c.get('jwtPayload').enterpriseId!);
         const employeeId = c.req.param('employeeId');
 
         const employee = await prisma.employee.findUnique({
@@ -71,7 +127,7 @@ app.delete(
     }),
     async c => {
 
-        const enterpriseId = parseInt(c.get('jwtPayload').id);
+        const enterpriseId = parseInt(c.get('jwtPayload').enterpriseId!);
         const employeeId = c.req.param('employeeId');
 
         const employee = await prisma.employee.findUnique({

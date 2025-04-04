@@ -25,7 +25,7 @@ app.post(
     async c => {
 
         const validated = c.req.valid("json");
-        const enterpriseId = c.get('jwtPayload').id;
+        const enterpriseId = c.get('jwtPayload').enterpriseId!;
 
         try {
             await prisma.offer.create({
@@ -71,7 +71,7 @@ app.patch(
     async c => {
 
         const validated = c.req.valid('json');
-        const enterpriseId = c.get('jwtPayload').id;
+        const enterpriseId = c.get('jwtPayload').enterpriseId!;
         const offerId = c.req.param('offerId');
 
         const offer = await prisma.offer.findFirst({
@@ -128,7 +128,7 @@ app.get(
     }),
     authorization(Role.ENTERPRISE),
     async c => {
-        const enterpriseId = c.get('jwtPayload').id;
+        const enterpriseId = c.get('jwtPayload').enterpriseId!;
         const offset = c.req.query("offset") ?? "0";
         const limit = c.req.query("limit") ?? "10";
 
@@ -176,7 +176,7 @@ app.get(
 
         const categoryId = c.req.param('categoryId');
         const offset = c.req.query("offset") ?? "0";
-        const enterpriseId = c.get('jwtPayload').id;
+        const enterpriseId = c.get('jwtPayload').enterpriseId!;
         const limit = c.req.query("limit") ?? "10";
 
         const totalOffers = await prisma.offer.count({
@@ -228,7 +228,7 @@ app.delete(
     authorization(Role.ENTERPRISE),
     async c => {
 
-        const enterpriseId = c.get('jwtPayload').id;
+        const enterpriseId = c.get('jwtPayload').enterpriseId!;
         const offerId = c.req.param('offerId');
 
         const offer = await prisma.offer.findFirst({
@@ -349,7 +349,7 @@ app.post(
     authorization(Role.CLIENT),
     async c => {
 
-        const clientId = parseInt(c.get('jwtPayload').id);
+        const clientId = parseInt(c.get('jwtPayload').clientId!);
         const offerId = c.req.param('offerId');
 
         const offer = await prisma.offer.findFirst({
@@ -404,6 +404,9 @@ app.post(
                     quantityLimit: {
                         decrement: 1,
                     },
+                    sold: {
+                        increment: 1,
+                    }
                 },
             });
         }
