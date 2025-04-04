@@ -49,3 +49,12 @@ export const getEnterprisesResponseSchema = z.object({
         })
     ),
 });
+
+export const updateEnterpriseRequestSchema = z.object({
+    email: z.string().email().optional(),
+    firstName: z.string().optional(),
+    phone: z.string().optional(),
+    address: z.string().optional(),
+    commissionPercentage: z.number().optional(),
+    description: z.string().optional(),
+});

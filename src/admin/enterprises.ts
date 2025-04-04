@@ -1,10 +1,12 @@
 import { Hono } from 'hono';
 import { describeRoute } from 'hono-openapi';
-import { getEnterprisesDocs, getEnterpriseDocs } from '../../documentation/enterprises.docs';
+import { getEnterprisesDocs, getEnterpriseDocs, updateEnterpriseDocs, deleteEnterpriseDocs } from '../../documentation/enterprises.docs';
 import "dotenv/config";
 import { PrismaClient } from '@prisma/client';
 import { getOffersEnterpriseDocs } from '../../documentation/offers.docs';
 import { getEmployeesDocs } from '../../documentation/employees.docs';
+import { registerEnterpriseRequestSchema } from '../../schemas/register';
+import { validator as zValidator } from 'hono-openapi/zod';
 
 // prefix: /api/admin/v1/enterprises
 const app = new Hono();
@@ -36,6 +38,52 @@ app.get(
         const enterpriseId = c.req.param('enterpriseId');
 
         const enterprise = await prisma.enterprise.findUnique({
+            where: {
+                id: parseInt(enterpriseId),
+            },
+        });
+
+        return c.json(enterprise);
+    });
+
+app.patch(
+    "/:enterpriseId",
+    describeRoute(updateEnterpriseDocs),
+    zValidator('json', registerEnterpriseRequestSchema),
+    async c => {
+
+        const enterpriseId = c.req.param('enterpriseId');
+        const validated = c.req.valid('json');
+
+        const enterprise = await prisma.enterprise.update({
+            where: {
+                id: parseInt(enterpriseId),
+            },
+            data: {
+                user: {
+                    update: {
+                        firstName: validated.firstName,
+                        email: validated.email,
+                    },
+                },
+                phone: validated.phone,
+                location: validated.address,
+                commissionPercentage: validated.commissionPercentage,
+                description: validated.description,
+            },
+        });
+
+        return c.json(enterprise);
+    });
+
+app.delete(
+    "/:enterpriseId",
+    describeRoute(deleteEnterpriseDocs),
+    async c => {
+
+        const enterpriseId = c.req.param('enterpriseId');
+
+        const enterprise = await prisma.enterprise.delete({
             where: {
                 id: parseInt(enterpriseId),
             },
