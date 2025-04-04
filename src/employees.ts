@@ -1,6 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { Hono } from 'hono';
-import 'dotenv/config';
+import { PrismaClient } from '@prisma/client';
 import { jwt } from 'hono/jwt';
 import { describeRoute } from 'hono-openapi';
 import { Variables } from '../schemas/jwtVariables';
@@ -9,6 +8,8 @@ import { validator as zValidator } from "hono-openapi/zod";
 import { updateEmployeeRequestSchema } from '../schemas/employees';
 import { hash } from 'bcrypt';
 import { authorization, Role } from '../middleware/authorization';
+
+import 'dotenv/config';
 
 // prefix: /api/v1/employees
 const app = new Hono<{ Variables: Variables }>();
@@ -27,6 +28,10 @@ app.get(
         const employees = await prisma.employee.findMany({
             where: {
                 enterpriseId: enterpriseId,
+            },
+            include: {
+                enterprise: true,
+                user: true,
             },
             orderBy: {
                 id: 'asc',
@@ -125,6 +130,7 @@ app.delete(
     jwt({
         secret: process.env.TOKEN_SECRET!,
     }),
+    authorization(Role.ENTERPRISE),
     async c => {
 
         const enterpriseId = parseInt(c.get('jwtPayload').enterpriseId!);

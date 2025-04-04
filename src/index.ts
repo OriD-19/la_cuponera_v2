@@ -42,7 +42,6 @@ app.route('/profile', profile);
 app.route('/enterprises', enterprises);
 
 // protect the route of employees only for an enterprise
-app.use('/employees',  authorization(Role.EMPLOYEE));
 app.route('/employees', employees);
 
 adminApp.route("/offers", adminOffers);

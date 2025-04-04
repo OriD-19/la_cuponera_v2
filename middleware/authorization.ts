@@ -10,7 +10,9 @@ export enum Role {
 
 export const authorization = (role: Role) => {
     return createMiddleware<{ Variables: Variables }>(async (c, next) => {
-        const jwt = c.get('jwtPayload');
+        let jwt = c.get('jwtPayload');
+
+        console.log("jwt", jwt.role, role);
 
         if (jwt.role !== role) {
             return c.json({

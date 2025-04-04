@@ -135,7 +135,7 @@ app.post(
 
         return c.json({
             message: "unknown user type",
-        }, 500);
+        }, 400);
     });
 
 export default app;
