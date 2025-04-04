@@ -109,7 +109,7 @@ app.get(
                         id: true,
                         enterpriseCode: true,
                         description: true,
-                        categoryId: true,
+                        Category: true,
                         user: {
                             select: {
                                 id: true,
