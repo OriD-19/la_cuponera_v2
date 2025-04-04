@@ -103,6 +103,26 @@ app.get(
             where: {
                 offerState: OfferState.PENDING,
             },
+            include: {
+                enterprise: {
+                    select: {
+                        id: true,
+                        enterpriseCode: true,
+                        description: true,
+                        categoryId: true,
+                        user: {
+                            select: {
+                                id: true,
+                                email: true,
+                                firstName: true,
+                                lastName: true,
+                                createdAt: true,
+                                updatedAt: true,
+                            }
+                        }
+                    }
+                },
+            }
         });
 
         return c.json(offers);
