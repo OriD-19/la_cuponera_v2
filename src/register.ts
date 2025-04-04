@@ -85,6 +85,11 @@ app.post(
                     commissionPercentage: validated.commissionPercentage,
                     phone: validated.phone,
                     description: validated.description,
+                    Category: {
+                        connect: {
+                            id: validated.categoryId,
+                        }
+                    }
                 }
             });
 
