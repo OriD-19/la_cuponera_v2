@@ -8,7 +8,7 @@ import { validator as zValidator } from 'hono-openapi/zod';
 import { createOfferRequestSchema, updateOfferRequestSchema } from '../schemas/offers';
 import { CouponState, OfferState, PrismaClient } from '@prisma/client';
 import { describeRoute } from 'hono-openapi';
-import { buyCouponDocs, createOfferDocs, deleteOfferDocs, getOfferDocs, getOffersDocs, getOffersEnterpriseDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
+import { buyCouponDocs, createOfferDocs, deleteOfferDocs, discardOfferDocs, getOfferDocs, getOffersDocs, getOffersEnterpriseDocs, updateOfferRequestDocs } from '../documentation/offers.docs';
 
 // prefix: /api/v1/offers
 const app = new Hono<{ Variables: Variables }>();
@@ -252,6 +252,47 @@ app.delete(
 
         return c.json({
             message: "offer deleted",
+        });
+    });
+
+// for an enterprise: discard an offer to hide it from the public
+app.patch(
+    '/enterprise/:offerId/discard',
+    describeRoute(discardOfferDocs),
+    jwt({
+        secret: process.env.TOKEN_SECRET!,
+    }),
+    authorization(Role.ENTERPRISE),
+    async c => {
+
+        const offerId = c.req.param('offerId');
+
+        const offer = await prisma.offer.findFirst({
+            where: {
+                id: parseInt(offerId),
+                enterpriseId: parseInt(c.get('jwtPayload').enterpriseId!),
+            },
+        });
+
+        if (!offer) {
+            return c.json({
+                message: "offer not found",
+            }, 404);
+        }
+
+        await prisma.offer.update({
+            where: {
+                id: parseInt(offerId),
+            },
+            data: {
+                offerState: OfferState.DISCARDED,
+                offerRejectedReason: null,
+            },
+        });
+
+        return c.json({
+            message: "offer discarded successfully",
+            offerId: offer.id,
         });
     });
 

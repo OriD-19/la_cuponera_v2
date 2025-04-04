@@ -471,3 +471,54 @@ export const approveOfferAdminDocs: DescribeRouteOptions = {
         },
     },
 };
+
+export const discardOfferDocs: DescribeRouteOptions = {
+    description: "Discard an offer for admin",
+    requestParams: {
+        header: z.object({ 'Authorization': z.string() }),
+        route: z.object({ offerId: z.string() }),
+    },
+    security: [
+        {
+            bearerAuth: [],
+        }
+    ],
+    responses: {
+        200: {
+            description: "offer discarded successfully",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "offer discarded successfully",
+                            },
+                            offerId: {
+                                type: "number",
+                                example: 1,
+                            }
+                        },
+                    },
+                },
+            },
+        },
+        404: {
+            description: "offer not found",
+            content: {
+                "application/json": {
+                    schema: {
+                        type: "object",
+                        properties: {
+                            message: {
+                                type: "string",
+                                example: "offer not found",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+};
