@@ -314,7 +314,7 @@ app.get(
                 validUntil: {
                     gte: new Date(),
                 },
-            }
+            },
         });
 
         const numPages = Math.ceil(totalOffers / parseInt(limit));
@@ -330,6 +330,9 @@ app.get(
                 validUntil: {
                     gte: new Date(),
                 },
+            },
+            include: {
+                enterprise: true,
             }
         });
 
