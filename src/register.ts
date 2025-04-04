@@ -124,7 +124,7 @@ app.post(
         const passwordHash = await hash(validated.password, 12);
 
         try {
-            await prisma.employee.create({
+            const newEmployee = await prisma.employee.create({
                 data: {
                     user: {
                         create: {
@@ -143,8 +143,26 @@ app.post(
                 }
             });
 
+            const sendNewEmployee = await prisma.employee.findUnique({
+                where: {
+                    id: newEmployee.id,
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            firstName: true,
+                            lastName: true,
+                            email: true,
+                        }
+                    },
+                    enterprise: true,
+                }
+            });
+
             return c.json({
                 message: "employee created successfully",
+                user: sendNewEmployee
             }, 201);
         } catch (e: any) {
             if (e instanceof Prisma.PrismaClientKnownRequestError) {
