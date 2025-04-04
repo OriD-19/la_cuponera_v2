@@ -19,6 +19,10 @@ app.get(
             orderBy: {
                 enterpriseCode: 'asc',
             },
+            include: {
+                user: true,
+                Category: true,
+            }
         });
 
         return c.json(enterprises);
