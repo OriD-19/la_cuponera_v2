@@ -18,11 +18,16 @@ app.post(
         const validated = c.req.valid('json');
 
         try {
-            await prisma.category.create({
+            const category = await prisma.category.create({
                 data: {
                     name: validated.name,
                     description: validated.description,
                 },
+            });
+
+            return c.json({
+                message: "category created successfully",
+                categoryId: category.id,
             });
 
         } catch (err: any) {
@@ -35,9 +40,6 @@ app.post(
             }
         }
 
-        return c.json({
-            message: "category created successfully",
-        });
     }
 );
 
@@ -58,6 +60,34 @@ app.patch(
             return c.json({
                 message: "category not found",
             }, 404);
+        }
+
+        const validated = c.req.valid('json');
+
+        try {
+            const updatedCategory = await prisma.category.update({
+                where: {
+                    id: parseInt(categoryId),
+                },
+                data: {
+                    name: validated.name,
+                    description: validated.description,
+                },
+            });
+
+            return c.json({
+                message: "category updated successfully",
+                categoryId: updatedCategory.id,
+            });
+
+        } catch (err: any) {
+            if (err instanceof Prisma.PrismaClientKnownRequestError) {
+                if (err.code === 'P2002') {
+                    return c.json({
+                        message: "error: must input unique name",
+                    }, 400);
+                }
+            }
         }
     }
 );
