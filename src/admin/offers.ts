@@ -123,6 +123,26 @@ app.get(
         const offers = await prisma.offer.findMany({
             skip: parseInt(offset),
             take: parseInt(limit),
+            include: {
+                enterprise: {
+                    select: {
+                        id: true,
+                        enterpriseCode: true,
+                        description: true,
+                        categoryId: true,
+                        user: {
+                            select: {
+                                id: true,
+                                email: true,
+                                firstName: true,
+                                lastName: true,
+                                createdAt: true,
+                                updatedAt: true,
+                            }
+                        }
+                    }
+                },
+            }
         });
 
         const basePath = c.req.url.split("?")[0];
